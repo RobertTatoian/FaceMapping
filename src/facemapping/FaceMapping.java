@@ -10,6 +10,7 @@ import org.opencv.core.Core;
 import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
 import org.opencv.core.Size;
+import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfRect;
 import org.opencv.imgproc.Imgproc;
@@ -39,26 +40,37 @@ public class FaceMapping extends PApplet {
 	CascadeClassifier		face_cascade		= new CascadeClassifier();
 	CascadeClassifier		eyes_cascade		= new CascadeClassifier();
 
+	boolean					aTest				= true;
+
 
 	public void settings( )
 		{
-			// Open the first available camera
-			camera.open(0);
-
-			if (camera.isOpened())
+			if (!aTest)
 				{
-					cv_width = camera.get(Videoio.CV_CAP_PROP_FRAME_WIDTH);
-					cv_height = camera.get(Videoio.CV_CAP_PROP_FRAME_HEIGHT);
-					System.out.println("The width of the camera being used is: " + (int)cv_width);
-					System.out.println("The height of the camera being used is: " + (int)cv_height);
-					size((int)cv_width, (int)cv_height);
+					// Open the first available camera
+					camera.open(0);
+
+					if (camera.isOpened())
+						{
+							cv_width = camera.get(Videoio.CV_CAP_PROP_FRAME_WIDTH);
+							cv_height = camera.get(Videoio.CV_CAP_PROP_FRAME_HEIGHT);
+							System.out.println("The width of the camera being used is: " + (int)cv_width);
+							System.out.println("The height of the camera being used is: " + (int)cv_height);
+							size((int)cv_width, (int)cv_height);
+						}
+					else
+						{
+							System.err.println("Exiting application: video stream is closed.");
+							System.exit(1);
+						}
 				}
 			else
 				{
-					System.err.println("Exiting application: video stream is closed.");
-					System.exit(1);
+					frame = Imgcodecs.imread("Test Images\\Chimp.jpg");
+					System.out.println("The width of the camera being used is: " + frame.cols());
+					System.out.println("The height of the camera being used is: " + frame.rows());
+					size(frame.cols(), frame.rows());
 				}
-
 		}
 
 
@@ -97,8 +109,10 @@ public class FaceMapping extends PApplet {
 
 	public void draw( )
 		{
-
-			camera.read(frame); // Read the frame from the camera
+			if (!aTest)
+				{
+					camera.read(frame); // Read the frame from the camera
+				}
 			detectAndDisplay(frame); // Detect the face
 			img = new PImage(toBufferedImage(frame)); // Convert the frame with
 														// the detected face to
