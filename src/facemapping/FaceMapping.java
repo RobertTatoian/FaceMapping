@@ -177,11 +177,16 @@ public class FaceMapping extends PApplet {
 			Rect[ ] facesArray = faces.toArray();
 			for (int i = 0; i < facesArray.length; i++)
 				{
+					/*
+					 * Note tl() in the second argument is most likely top left
+					 * and br() in the next argument is most likely bottom right
+					 */
 					Imgproc.rectangle(frame, facesArray[i].tl(), facesArray[i].br(), new Scalar(0, 255, 0, 255), 1);
 
 					MatOfRect facesROI = new MatOfRect(facesArray[i]);
 
-					this.eyes_cascade.detectMultiScale(grayFrame, facesROI);
+					this.eyes_cascade.detectMultiScale(grayFrame, facesROI, 1.1, 2, 0 | Objdetect.CASCADE_SCALE_IMAGE,
+							new Size(this.absoluteFaceSize, this.absoluteFaceSize), new Size());
 
 					Rect[ ] eyesArray = facesROI.toArray();
 
@@ -189,6 +194,8 @@ public class FaceMapping extends PApplet {
 						{
 							Imgproc.rectangle(frame, eyesArray[i].tl(), eyesArray[i].br(), new Scalar(0, 255, 0, 255),
 									1);
+
+
 						}
 
 				}
