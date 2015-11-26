@@ -42,7 +42,7 @@ public class FaceMapping extends PApplet {
 
 	public void settings( )
 		{
-			//Open the first available camera
+			// Open the first available camera
 			camera.open(0);
 
 			if (camera.isOpened())
@@ -177,18 +177,19 @@ public class FaceMapping extends PApplet {
 			Rect[ ] facesArray = faces.toArray();
 			for (int i = 0; i < facesArray.length; i++)
 				{
-					Imgproc.rectangle(frame, facesArray[i].tl(), facesArray[i].br(), new Scalar(0, 255, 0, 255), 3);
+					Imgproc.rectangle(frame, facesArray[i].tl(), facesArray[i].br(), new Scalar(0, 255, 0, 255), 1);
 
-					/*
-					 * Eye tracking code I couldn't get working.
-					 */
-					// Mat faceROI = grayFrame.submat(facesArray[i]);
-					// MatOfRect eyes = new MatOfRect();
-					//
-					// eyes_cascade.detectMultiScale(faceROI, eyes, 1.1, 2, 0 |
-					// Objdetect.CASCADE_SCALE_IMAGE, new Size(
-					// this.absoluteFaceSize, this.absoluteFaceSize), new
-					// Size());
+					MatOfRect facesROI = new MatOfRect(facesArray[i]);
+
+					this.eyes_cascade.detectMultiScale(grayFrame, facesROI);
+
+					Rect[ ] eyesArray = facesROI.toArray();
+
+					for (int j = 0; j < eyesArray.length; j++)
+						{
+							Imgproc.rectangle(frame, eyesArray[i].tl(), eyesArray[i].br(), new Scalar(0, 255, 0, 255),
+									1);
+						}
 
 				}
 		}
