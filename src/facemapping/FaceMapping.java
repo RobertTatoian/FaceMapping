@@ -24,32 +24,36 @@ import processing.core.PImage;
 
 
 public class FaceMapping extends PApplet {
-
-	private VideoCapture	camera				= new VideoCapture();
-
-	Mat						frame				= new Mat();
-
-	private double			cv_width;
-	private double			cv_height;
-	private int				absoluteFaceSize;
-	PImage					img;
-
-	String					face_cascade_name	= "CascadeClassifiers\\haarcascade_frontalface_alt.xml";
-	String					eyes_cascade_name	= "CascadeClassifiers\\haarcascade_eye_tree_eyeglasses.xml";
-
-	CascadeClassifier		face_cascade		= new CascadeClassifier();
-	CascadeClassifier		eyes_cascade		= new CascadeClassifier();
-
-	boolean					aTest				= true;
-
-
+	
+	private VideoCapture		camera				= new VideoCapture();
+													
+	private Mat					frame				= new Mat();
+													
+	private double				cv_width;
+	private double				cv_height;
+								
+	private int					absoluteFaceSize;
+								
+	private PImage				img;
+								
+	private String				face_cascade_name	= "CascadeClassifiers\\haarcascade_frontalface_alt.xml";
+	private String				eyes_cascade_name	= "CascadeClassifiers\\haarcascade_eye_tree_eyeglasses.xml";
+	private String				mouth_cascade_name	= "CascadeClassifiers\\haarcascade_smile.xml";
+													
+	private CascadeClassifier	face_cascade		= new CascadeClassifier();
+	private CascadeClassifier	eyes_cascade		= new CascadeClassifier();
+	private CascadeClassifier	mouth_cascade		= new CascadeClassifier();
+													
+	boolean						aTest				= false;
+													
+													
 	public void settings( )
 		{
 			if (!aTest)
 				{
 					// Open the first available camera
 					camera.open(0);
-
+					
 					if (camera.isOpened())
 						{
 							cv_width = camera.get(Videoio.CV_CAP_PROP_FRAME_WIDTH);
@@ -72,15 +76,15 @@ public class FaceMapping extends PApplet {
 					size(frame.cols(), frame.rows());
 				}
 		}
-
-
+		
+		
 	public void setup( )
 		{
 			/*
 			 * Load the CascadeClassifiers Throw an error and exit if we can't
 			 * find the file.
 			 */
-
+			
 			// Probably could use some better error handling...
 			if (face_cascade.load(face_cascade_name))
 				{
@@ -92,7 +96,7 @@ public class FaceMapping extends PApplet {
 					System.err.println("Exiting application: Cannot find face classifer.");
 					System.exit(2);
 				}
-
+				
 			if (eyes_cascade.load(eyes_cascade_name))
 				{
 					System.out.println("Succeded loading eyes_cascade_name.xml");
@@ -103,25 +107,119 @@ public class FaceMapping extends PApplet {
 					System.err.println("Exiting application: Cannot find eyes classifer.");
 					System.exit(2);
 				}
-
+				
+			if (mouth_cascade.load(mouth_cascade_name))
+				{
+					System.out.println("Succeded loading profile_cascade_name.xml");
+				}
+			else
+				{
+					System.err.println("Error loading profile_cascade_name.xml");
+					System.err.println("Exiting application: Cannot find profile classifer.");
+					System.exit(2);
+				}
 		}
-
-
+		
+		
 	public void draw( )
 		{
 			if (!aTest)
 				{
 					camera.read(frame); // Read the frame from the camera
 				}
-			detectAndDisplay(frame); // Detect the face
+				
+			detectFace(frame); // Detect the face
+			
+			
 			img = new PImage(toBufferedImage(frame)); // Convert the frame with
-														// the detected face to
-														// a PImage
+			                                          // the detected face to
+			                                          // a PImage
 			image(img, 0, 0); // Display that image at (0,0)
-
+			
 		}
+		
+		
+	/*
+	 * I follow parts of the tutorial found below to get this face detection
+	 * code. I'm currently trying to get it to work with the eyes.
+	 * http://opencv-java-tutorials.readthedocs.org/en/latest/08%20-%20Face%
+	 * 20Recognition%20and%20Tracking.html
+	 */
+	private void detectFace(Mat frame)
+		{
+			
+			// init
+			MatOfRect faces = new MatOfRect();
+			Mat grayFrame = new Mat();
+			
+			// convert the frame in gray scale
+			Imgproc.cvtColor(frame, grayFrame, Imgproc.COLOR_BGR2GRAY);
+			// equalize the frame histogram to improve the result
+			Imgproc.equalizeHist(grayFrame, grayFrame);
+			
+			// compute minimum face size (20% of the frame height)
+			if (this.absoluteFaceSize == 0)
+				{
+					int height = grayFrame.rows();
+					if (Math.round(height * 0.2f) > 0)
+						{
+							this.absoluteFaceSize = Math.round(height * 0.2f);
+						}
+				}
+				
+			// detect faces
+			try
+				{
+					this.face_cascade.detectMultiScale(grayFrame, faces, 1.1, 2, 0 | Objdetect.CASCADE_SCALE_IMAGE,
+					        new Size(this.absoluteFaceSize, this.absoluteFaceSize), new Size());
+				}
+			catch (Exception e)
+				{
+					System.err.println("There is a problem with face_cascade detection. Printing stack trace: ");
+					e.printStackTrace();
+					System.exit(-1);
+				}
+				
+			// each rectangle in faces is a face
+			Rect[ ] facesArray = faces.toArray();
+			
+			for (int i = 0; i < facesArray.length; i++)
+				{
+					/*
+					 * Note tl() in the second argument is most likely top left
+					 * and br() in the next argument is most likely bottom right
+					 */
+					Imgproc.rectangle(frame, facesArray[i].tl(), facesArray[i].br(), new Scalar(0, 255, 0, 255), 1);
+					
+					Mat greyROI = grayFrame.submat(facesArray[i]);
+					MatOfRect facesROI = new MatOfRect(facesArray[i]);
 
-
+					eyes_cascade.detectMultiScale(greyROI, facesROI,1.1, 3, 0, new Size(50d,50d), facesArray[i].size());
+					
+					Rect[ ] eyesArray = facesROI.toArray();
+					
+					for (int j = 0; j < eyesArray.length; j++)
+						{
+							Imgproc.rectangle(frame, eyesArray[i].tl(), eyesArray[i].br(), new Scalar(255, 0, 0, 255),
+							        1);
+									
+									
+						}
+					
+					mouth_cascade.detectMultiScale(greyROI, facesROI,1.5, 3, 0, new Size(50d,50d), facesArray[i].size());
+					
+					Rect[ ] mouthRect = facesROI.toArray();
+					
+					for (int j = 0; j < mouthRect.length; j++)
+						{
+							Imgproc.rectangle(frame, mouthRect[i].tl(), mouthRect[i].br(), new Scalar(255, 255, 0, 255),
+							        1);	
+						}
+						
+				}
+		}
+		
+		
 	/*
 	 * Converts the Mat object to an Image object so that it can be encapsulated
 	 * by a PImage to work with processing. Found at:
@@ -130,7 +228,7 @@ public class FaceMapping extends PApplet {
 	 */
 	public Image toBufferedImage(Mat m)
 		{
-
+			
 			int type = BufferedImage.TYPE_BYTE_GRAY;
 			if (m.channels() > 1)
 				{
@@ -144,78 +242,8 @@ public class FaceMapping extends PApplet {
 			System.arraycopy(b, 0, targetPixels, 0, b.length);
 			return image;
 		}
-
-
-	/*
-	 * I follow parts of the tutorial found below to get this face detection
-	 * code. I'm currently trying to get it to work with the eyes.
-	 * http://opencv-java-tutorials.readthedocs.org/en/latest/08%20-%20Face%
-	 * 20Recognition%20and%20Tracking.html
-	 */
-	private void detectAndDisplay(Mat frame)
-		{
-
-			// init
-			MatOfRect faces = new MatOfRect();
-			Mat grayFrame = new Mat();
-
-			// convert the frame in gray scale
-			Imgproc.cvtColor(frame, grayFrame, Imgproc.COLOR_BGR2GRAY);
-			// equalize the frame histogram to improve the result
-			Imgproc.equalizeHist(grayFrame, grayFrame);
-
-			// compute minimum face size (20% of the frame height)
-			if (this.absoluteFaceSize == 0)
-				{
-					int height = grayFrame.rows();
-					if (Math.round(height * 0.2f) > 0)
-						{
-							this.absoluteFaceSize = Math.round(height * 0.2f);
-						}
-				}
-
-			// detect faces
-			try
-				{
-					this.face_cascade.detectMultiScale(grayFrame, faces, 1.1, 2, 0 | Objdetect.CASCADE_SCALE_IMAGE,
-							new Size(this.absoluteFaceSize, this.absoluteFaceSize), new Size());
-				}
-			catch (Exception e)
-				{
-					System.err.println("There is a problem with face_cascade detection. Printing stack trace: ");
-					e.printStackTrace();
-					System.exit(-1);
-				}
-
-			// each rectangle in faces is a face
-			Rect[ ] facesArray = faces.toArray();
-			for (int i = 0; i < facesArray.length; i++)
-				{
-					/*
-					 * Note tl() in the second argument is most likely top left
-					 * and br() in the next argument is most likely bottom right
-					 */
-					Imgproc.rectangle(frame, facesArray[i].tl(), facesArray[i].br(), new Scalar(0, 255, 0, 255), 1);
-
-					MatOfRect facesROI = new MatOfRect(facesArray[i]);
-
-					this.eyes_cascade.detectMultiScale(grayFrame, facesROI, 1.1, 2, 0 | Objdetect.CASCADE_SCALE_IMAGE,
-							new Size(this.absoluteFaceSize, this.absoluteFaceSize), new Size());
-
-					Rect[ ] eyesArray = facesROI.toArray();
-
-					for (int j = 0; j < eyesArray.length; j++)
-						{
-							Imgproc.rectangle(frame, eyesArray[i].tl(), eyesArray[i].br(), new Scalar(0, 255, 0, 255),
-									1);
-
-
-						}
-
-				}
-		}
-
-
+		
+		
 	/*
 	 * REQUIRED TO RUN BOTH PROCESSING AND OPENCV!
 	 */
@@ -225,6 +253,6 @@ public class FaceMapping extends PApplet {
 			System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
 			// Create the Processing window
 			PApplet.main(new String[ ] { facemapping.FaceMapping.class.getName() });
-
+			
 		}
 }
