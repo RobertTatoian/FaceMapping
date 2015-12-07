@@ -191,20 +191,24 @@ public class FaceMapping extends PApplet {
 					 */
 					Imgproc.rectangle(frame, facesArray[i].tl(), facesArray[i].br(), new Scalar(0, 255, 0, 255), 1);
 					
+					//The face area that was detected in greyscale
 					Mat greyROI = grayFrame.submat(facesArray[i]);
+					
+					//The rectangular bounds on the face area
 					MatOfRect facesROI = new MatOfRect(facesArray[i]);
 
-					eyes_cascade.detectMultiScale(greyROI, facesROI,1.1, 3, 0, new Size(50d,50d), facesArray[i].size());
-					
-					Rect[ ] eyesArray = facesROI.toArray();
-					
-					for (int j = 0; j < eyesArray.length; j++)
-						{
-							Imgproc.rectangle(frame, eyesArray[i].tl(), eyesArray[i].br(), new Scalar(255, 0, 0, 255),
-							        1);
-									
-									
-						}
+//					eyes_cascade.detectMultiScale(greyROI, facesROI,1.1, 3, 0, new Size(50d,50d), facesArray[i].size());
+//					
+//					Rect[ ] eyesArray = facesROI.toArray();
+//					
+//					for (int j = 0; j < eyesArray.length; j++)
+//						{
+//							Imgproc.rectangle(frame, eyesArray[i].tl(), eyesArray[i].br(), new Scalar(255, 0, 0, 255),
+//							        1);
+//									
+//									
+//						}
+					searchForLeftEye(greyROI, facesROI, facesArray[i]);
 					
 					mouth_cascade.detectMultiScale(greyROI, facesROI,1.5, 3, 0, new Size(50d,50d), facesArray[i].size());
 					
@@ -212,14 +216,26 @@ public class FaceMapping extends PApplet {
 					
 					for (int j = 0; j < mouthRect.length; j++)
 						{
-							Imgproc.rectangle(frame, mouthRect[i].tl(), mouthRect[i].br(), new Scalar(255, 255, 0, 255),
+							Imgproc.rectangle(frame, mouthRect[j].tl(), mouthRect[j].br(), new Scalar(255, 255, 0, 255),
 							        1);	
 						}
 						
 				}
 		}
 		
-		
+		private void searchForLeftEye(Mat greyFaceSubMat, MatOfRect rectOfFace, Rect detectedFaceRect){
+
+			eyes_cascade.detectMultiScale(greyFaceSubMat.adjustROI(0, 0, detectedFaceRect.width/2, 0), rectOfFace,1.1, 3, 0, new Size(50d,50d), detectedFaceRect.size());
+			
+			Rect[ ] eyesArray = rectOfFace.toArray();
+			
+			for (int j = 0; j < eyesArray.length; j++)
+				{
+					Imgproc.rectangle(frame, eyesArray[j].tl(), eyesArray[j].br(), new Scalar(255, 0, 0, 255),
+					        1);
+				}
+			
+		}
 	/*
 	 * Converts the Mat object to an Image object so that it can be encapsulated
 	 * by a PImage to work with processing. Found at:
