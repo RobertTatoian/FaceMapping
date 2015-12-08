@@ -6,13 +6,8 @@ import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
 
-import org.opencv.core.Core;
-import org.opencv.core.Rect;
-import org.opencv.core.Scalar;
-import org.opencv.core.Size;
+import org.opencv.core.*;
 import org.opencv.imgcodecs.Imgcodecs;
-import org.opencv.core.Mat;
-import org.opencv.core.MatOfRect;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.objdetect.CascadeClassifier;
 import org.opencv.objdetect.Objdetect;
@@ -147,16 +142,16 @@ public class FaceMapping extends PApplet {
 	 */
 	private void detectFace(Mat frame)
 		{
-			
+
 			// init
 			MatOfRect faces = new MatOfRect();
 			Mat grayFrame = new Mat();
-			
+
 			// convert the frame in gray scale
 			Imgproc.cvtColor(frame, grayFrame, Imgproc.COLOR_BGR2GRAY);
 			// equalize the frame histogram to improve the result
 			Imgproc.equalizeHist(grayFrame, grayFrame);
-			
+
 			// compute minimum face size (20% of the frame height)
 			if (this.absoluteFaceSize == 0)
 				{
@@ -166,7 +161,7 @@ public class FaceMapping extends PApplet {
 							this.absoluteFaceSize = Math.round(height * 0.2f);
 						}
 				}
-				
+
 			// detect faces
 			try
 				{
@@ -179,10 +174,10 @@ public class FaceMapping extends PApplet {
 					e.printStackTrace();
 					System.exit(-1);
 				}
-				
+
 			// each rectangle in faces is a face
 			Rect[ ] facesArray = faces.toArray();
-			
+
 			for (int i = 0; i < facesArray.length; i++)
 				{
 					/*
@@ -190,52 +185,48 @@ public class FaceMapping extends PApplet {
 					 * and br() in the next argument is most likely bottom right
 					 */
 					Imgproc.rectangle(frame, facesArray[i].tl(), facesArray[i].br(), new Scalar(0, 255, 0, 255), 1);
-					
+
 					//The face area that was detected in greyscale
 					Mat greyROI = grayFrame.submat(facesArray[i]);
-					
+
 					//The rectangular bounds on the face area
 					MatOfRect facesROI = new MatOfRect(facesArray[i]);
 
-//					eyes_cascade.detectMultiScale(greyROI, facesROI,1.1, 3, 0, new Size(50d,50d), facesArray[i].size());
-//					
-//					Rect[ ] eyesArray = facesROI.toArray();
-//					
-//					for (int j = 0; j < eyesArray.length; j++)
-//						{
-//							Imgproc.rectangle(frame, eyesArray[i].tl(), eyesArray[i].br(), new Scalar(255, 0, 0, 255),
-//							        1);
-//									
-//									
-//						}
-					searchForLeftEye(greyROI, facesROI, facesArray[i]);
-					
+					searchForEyes(greyROI, facesArray[i]);
+
 					mouth_cascade.detectMultiScale(greyROI, facesROI,1.5, 3, 0, new Size(50d,50d), facesArray[i].size());
-					
+
 					Rect[ ] mouthRect = facesROI.toArray();
-					
+
 					for (int j = 0; j < mouthRect.length; j++)
 						{
+							mouthRect[j].x += facesArray[i].x;
+							mouthRect[j].y += facesArray[i].y;
 							Imgproc.rectangle(frame, mouthRect[j].tl(), mouthRect[j].br(), new Scalar(255, 255, 0, 255),
-							        1);	
+							        1);
 						}
-						
-				}
-		}
-		
-		private void searchForLeftEye(Mat greyFaceSubMat, MatOfRect rectOfFace, Rect detectedFaceRect){
 
-			eyes_cascade.detectMultiScale(greyFaceSubMat.adjustROI(0, 0, detectedFaceRect.width/2, 0), rectOfFace,1.1, 3, 0, new Size(50d,50d), detectedFaceRect.size());
-			
-			Rect[ ] eyesArray = rectOfFace.toArray();
-			
-			for (int j = 0; j < eyesArray.length; j++)
-				{
-					Imgproc.rectangle(frame, eyesArray[j].tl(), eyesArray[j].br(), new Scalar(255, 0, 0, 255),
-					        1);
 				}
-			
 		}
+
+		private void searchForEyes(Mat greyFaceSubMat, Rect detectedFace)
+			{
+
+				MatOfRect eyes = new MatOfRect();
+				eyes_cascade.detectMultiScale(greyFaceSubMat, eyes);
+				Rect[ ] eyesArray = eyes.toArray();
+
+				for (int j = 0; j < eyesArray.length; j++)
+					{
+						Rect e = eyesArray[j];
+						e.x += detectedFace.x;
+						e.y += detectedFace.y;
+
+						Imgproc.rectangle(frame, e.tl(), e.br(),
+															new Scalar(255, 0, 0, 255), 1);
+					}
+			}
+
 	/*
 	 * Converts the Mat object to an Image object so that it can be encapsulated
 	 * by a PImage to work with processing. Found at:
