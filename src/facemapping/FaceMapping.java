@@ -23,7 +23,7 @@ import processing.core.PApplet;
 import processing.core.PImage;
 
 
-public class FaceMapping extends PApplet {
+public class FaceMapping extends PApplet{
 	
 	private VideoCapture		camera				= new VideoCapture();
 													
@@ -44,7 +44,7 @@ public class FaceMapping extends PApplet {
 	private CascadeClassifier	eyes_cascade		= new CascadeClassifier();
 	private CascadeClassifier	mouth_cascade		= new CascadeClassifier();
 													
-	boolean						aTest				= false;
+	boolean						aTest				= true;
 													
 													
 	public void settings( )
@@ -70,7 +70,7 @@ public class FaceMapping extends PApplet {
 				}
 			else
 				{
-					frame = Imgcodecs.imread("Test Images\\Chimp.jpg");
+					frame = Imgcodecs.imread("Test Images\\Lenna.png");
 					System.out.println("The width of the camera being used is: " + frame.cols());
 					System.out.println("The height of the camera being used is: " + frame.rows());
 					size(frame.cols(), frame.rows());
@@ -136,6 +136,7 @@ public class FaceMapping extends PApplet {
 			                                          // a PImage
 			image(img, 0, 0); // Display that image at (0,0)
 			
+			
 		}
 		
 		
@@ -148,7 +149,7 @@ public class FaceMapping extends PApplet {
 	private void detectFace(Mat frame)
 		{
 			
-			// init
+			// Initialize
 			MatOfRect faces = new MatOfRect();
 			Mat grayFrame = new Mat();
 			
@@ -196,7 +197,9 @@ public class FaceMapping extends PApplet {
 					
 					//The rectangular bounds on the face area
 					MatOfRect facesROI = new MatOfRect(facesArray[i]);
-
+					
+					Imgcodecs.imwrite("Captured Images//Faces//FaceROI_"+ i +".png", greyROI);
+					
 //					eyes_cascade.detectMultiScale(greyROI, facesROI,1.1, 3, 0, new Size(50d,50d), facesArray[i].size());
 //					
 //					Rect[ ] eyesArray = facesROI.toArray();
@@ -210,30 +213,43 @@ public class FaceMapping extends PApplet {
 //						}
 					searchForLeftEye(greyROI, facesROI, facesArray[i]);
 					
-					mouth_cascade.detectMultiScale(greyROI, facesROI,1.5, 3, 0, new Size(50d,50d), facesArray[i].size());
-					
-					Rect[ ] mouthRect = facesROI.toArray();
-					
-					for (int j = 0; j < mouthRect.length; j++)
-						{
-							Imgproc.rectangle(frame, mouthRect[j].tl(), mouthRect[j].br(), new Scalar(255, 255, 0, 255),
-							        1);	
-						}
+					searchForMouth(greyROI, facesROI, facesArray[i]);
 						
 				}
 		}
 		
 		private void searchForLeftEye(Mat greyFaceSubMat, MatOfRect rectOfFace, Rect detectedFaceRect){
 
-			eyes_cascade.detectMultiScale(greyFaceSubMat.adjustROI(0, 0, detectedFaceRect.width/2, 0), rectOfFace,1.1, 3, 0, new Size(50d,50d), detectedFaceRect.size());
+			Mat leftEyeSubMat = greyFaceSubMat.adjustROI(0, 0, 0, 0);
+			
+			eyes_cascade.detectMultiScale(leftEyeSubMat, rectOfFace,1.1, 3, 0, new Size(50d,50d), detectedFaceRect.size());
 			
 			Rect[ ] eyesArray = rectOfFace.toArray();
 			
 			for (int j = 0; j < eyesArray.length; j++)
 				{
+					Imgcodecs.imwrite("Captured Images//Left Eyes//Left Eye ROI_"+ j +".png", leftEyeSubMat);
+					
 					Imgproc.rectangle(frame, eyesArray[j].tl(), eyesArray[j].br(), new Scalar(255, 0, 0, 255),
 					        1);
 				}
+			
+		}
+		
+		private void searchForMouth(Mat greyFaceSubMat, MatOfRect rectOfFace, Rect detectedFaceRect) {
+			
+			mouth_cascade.detectMultiScale(greyFaceSubMat, rectOfFace,1.5, 3, 0, new Size(50d,50d), detectedFaceRect.size());
+			
+			Rect[ ] mouthRect = rectOfFace.toArray();
+			
+			for (int j = 0; j < mouthRect.length; j++)
+				{
+					Imgcodecs.imwrite("Captured Images//Mouths//Mouth ROI_"+ j +".png", greyFaceSubMat);
+					
+					Imgproc.rectangle(frame, mouthRect[j].tl(), mouthRect[j].br(), new Scalar(255, 255, 0, 255),
+					        1);	
+				}
+			
 			
 		}
 	/*
@@ -260,6 +276,7 @@ public class FaceMapping extends PApplet {
 		}
 		
 		
+
 	/*
 	 * REQUIRED TO RUN BOTH PROCESSING AND OPENCV!
 	 */
@@ -271,4 +288,23 @@ public class FaceMapping extends PApplet {
 			PApplet.main(new String[ ] { facemapping.FaceMapping.class.getName() });
 			
 		}
+
+	@Override
+	public void exitActual() {
+		try
+			{
+				camera.release();
+				System.exit(0);
+			}
+		catch (Exception e)
+			{
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		catch (StackOverflowError soe) {
+			System.err.println("!!!Stack Overflow Error!!!");
+			soe.printStackTrace();
+		}
+	}
+
 }
