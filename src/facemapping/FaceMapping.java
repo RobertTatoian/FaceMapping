@@ -23,7 +23,7 @@ import processing.core.PApplet;
 import processing.core.PImage;
 
 
-public class FaceMapping extends PApplet{
+public class FaceMapping extends PApplet {
 	
 	private VideoCapture		camera				= new VideoCapture();
 													
@@ -44,7 +44,7 @@ public class FaceMapping extends PApplet{
 	private CascadeClassifier	eyes_cascade		= new CascadeClassifier();
 	private CascadeClassifier	mouth_cascade		= new CascadeClassifier();
 													
-	boolean						aTest				= true;
+	boolean						aTest				= false;
 													
 													
 	public void settings( )
@@ -192,66 +192,74 @@ public class FaceMapping extends PApplet{
 					 */
 					Imgproc.rectangle(frame, facesArray[i].tl(), facesArray[i].br(), new Scalar(0, 255, 0, 255), 1);
 					
-					//The face area that was detected in greyscale
+					// The face area that was detected in greyscale
 					Mat greyROI = grayFrame.submat(facesArray[i]);
 					
-					//The rectangular bounds on the face area
+					// The rectangular bounds on the face area
 					MatOfRect facesROI = new MatOfRect(facesArray[i]);
 					
-					Imgcodecs.imwrite("Captured Images//Faces//FaceROI_"+ i +".png", greyROI);
+					Imgcodecs.imwrite("Captured Images//Faces//FaceROI_" + i + ".png", greyROI);
 					
-//					eyes_cascade.detectMultiScale(greyROI, facesROI,1.1, 3, 0, new Size(50d,50d), facesArray[i].size());
-//					
-//					Rect[ ] eyesArray = facesROI.toArray();
-//					
-//					for (int j = 0; j < eyesArray.length; j++)
-//						{
-//							Imgproc.rectangle(frame, eyesArray[i].tl(), eyesArray[i].br(), new Scalar(255, 0, 0, 255),
-//							        1);
-//									
-//									
-//						}
-					searchForLeftEye(greyROI, facesROI, facesArray[i]);
+					// eyes_cascade.detectMultiScale(greyROI, facesROI,1.1, 3,
+					// 0, new Size(50d,50d), facesArray[i].size());
+					//
+					// Rect[ ] eyesArray = facesROI.toArray();
+					//
+					// for (int j = 0; j < eyesArray.length; j++)
+					// {
+					// Imgproc.rectangle(frame, eyesArray[i].tl(),
+					// eyesArray[i].br(), new Scalar(255, 0, 0, 255),
+					// 1);
+					//
+					//
+					// }
 					
+					searchForEyes(greyROI, facesArray[i]);
 					searchForMouth(greyROI, facesROI, facesArray[i]);
-						
 				}
 		}
 		
-		private void searchForLeftEye(Mat greyFaceSubMat, MatOfRect rectOfFace, Rect detectedFaceRect){
-
-			Mat leftEyeSubMat = greyFaceSubMat.adjustROI(0, 0, 0, 0);
+		
+	private void searchForEyes(Mat greyFaceSubMat, Rect detectedFace)
+		{
 			
-			eyes_cascade.detectMultiScale(leftEyeSubMat, rectOfFace,1.1, 3, 0, new Size(50d,50d), detectedFaceRect.size());
-			
-			Rect[ ] eyesArray = rectOfFace.toArray();
+			MatOfRect eyes = new MatOfRect();
+			eyes_cascade.detectMultiScale(greyFaceSubMat, eyes);
+			Rect[ ] eyesArray = eyes.toArray();
 			
 			for (int j = 0; j < eyesArray.length; j++)
 				{
-					Imgcodecs.imwrite("Captured Images//Left Eyes//Left Eye ROI_"+ j +".png", leftEyeSubMat);
+					Rect e = eyesArray[j];
+					e.x += detectedFace.x;
+					e.y += detectedFace.y;
 					
-					Imgproc.rectangle(frame, eyesArray[j].tl(), eyesArray[j].br(), new Scalar(255, 0, 0, 255),
-					        1);
+					Imgproc.rectangle(frame, e.tl(), e.br(), new Scalar(255, 0, 0, 255), 1);
 				}
-			
 		}
 		
-		private void searchForMouth(Mat greyFaceSubMat, MatOfRect rectOfFace, Rect detectedFaceRect) {
+		
+	private void searchForMouth(Mat greyFaceSubMat, MatOfRect rectOfFace, Rect detectedFaceRect)
+		{
 			
-			mouth_cascade.detectMultiScale(greyFaceSubMat, rectOfFace,1.5, 3, 0, new Size(50d,50d), detectedFaceRect.size());
 			
+			mouth_cascade.detectMultiScale(greyFaceSubMat, rectOfFace, 1.5, 3, 0, new Size(50d, 50d),
+			        detectedFaceRect.size());
+					
 			Rect[ ] mouthRect = rectOfFace.toArray();
 			
 			for (int j = 0; j < mouthRect.length; j++)
 				{
-					Imgcodecs.imwrite("Captured Images//Mouths//Mouth ROI_"+ j +".png", greyFaceSubMat);
+					Imgcodecs.imwrite("Captured Images//Mouths//Mouth ROI_" + j + ".png", greyFaceSubMat);
 					
-					Imgproc.rectangle(frame, mouthRect[j].tl(), mouthRect[j].br(), new Scalar(255, 255, 0, 255),
-					        1);	
+					mouthRect[j].x += detectedFaceRect.x;
+					mouthRect[j].y += detectedFaceRect.y;
+					
+					Imgproc.rectangle(frame, mouthRect[j].tl(), mouthRect[j].br(), new Scalar(255, 255, 0, 255), 1);
 				}
-			
-			
+				
 		}
+		
+		
 	/*
 	 * Converts the Mat object to an Image object so that it can be encapsulated
 	 * by a PImage to work with processing. Found at:
@@ -276,7 +284,6 @@ public class FaceMapping extends PApplet{
 		}
 		
 		
-
 	/*
 	 * REQUIRED TO RUN BOTH PROCESSING AND OPENCV!
 	 */
@@ -288,23 +295,26 @@ public class FaceMapping extends PApplet{
 			PApplet.main(new String[ ] { facemapping.FaceMapping.class.getName() });
 			
 		}
-
+		
+		
 	@Override
-	public void exitActual() {
-		try
-			{
-				camera.release();
-				System.exit(0);
-			}
-		catch (Exception e)
-			{
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		catch (StackOverflowError soe) {
-			System.err.println("!!!Stack Overflow Error!!!");
-			soe.printStackTrace();
+	public void exitActual( )
+		{
+			try
+				{
+					camera.release();
+					System.exit(0);
+				}
+			catch (Exception e)
+				{
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			catch (StackOverflowError soe)
+				{
+					System.err.println("!!!Stack Overflow Error!!!");
+					soe.printStackTrace();
+				}
 		}
-	}
-
+		
 }
