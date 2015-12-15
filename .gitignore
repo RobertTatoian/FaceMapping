@@ -2,6 +2,9 @@
 .idea/**
 *.iml
 
+*ROI*.png
+*ROI_*.png
+
 # Begin Java files to ignore #
 *.class
 

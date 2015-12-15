@@ -9,12 +9,16 @@ import processing.core.PApplet;
  */
 public class Main extends PApplet {
 
+	public void draw()
+		{
+
+		}
+
 	public static void main(String _args[])
 		{
 			// Call system to load the OpenCV library
 			System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
 			// Create the Processing window
 			PApplet.main(new String[]{facemapping.FaceMapping.class.getName()});
-
 		}
 }

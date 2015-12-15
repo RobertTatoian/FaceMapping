@@ -128,15 +128,16 @@ public class FaceMapping extends PApplet {
 					camera.read(frame); // Read the frame from the camera
 				}
 				
-			detectFace(frame); // Detect the face
+			DetectedFace face = detectFace(frame); // Detect the face
 			
 			
 			img = new PImage(toBufferedImage(frame)); // Convert the frame with
 			                                          // the detected face to
 			                                          // a PImage
 			image(img, 0, 0); // Display that image at (0,0)
-			
-			
+
+			if (face != null)
+				image(face.toPImage(), 0, 0);
 		}
 		
 		
@@ -146,18 +147,18 @@ public class FaceMapping extends PApplet {
 	 * http://opencv-java-tutorials.readthedocs.org/en/latest/08%20-%20Face%
 	 * 20Recognition%20and%20Tracking.html
 	 */
-	private void detectFace(Mat frame)
+	private DetectedFace detectFace(Mat frame)
 		{
-			
 			// Initialize
 			MatOfRect faces = new MatOfRect();
 			Mat grayFrame = new Mat();
+			DetectedFace detectedFace = null;
 			
 			// convert the frame in gray scale
 			Imgproc.cvtColor(frame, grayFrame, Imgproc.COLOR_BGR2GRAY);
 			// equalize the frame histogram to improve the result
 			Imgproc.equalizeHist(grayFrame, grayFrame);
-			
+
 			// compute minimum face size (20% of the frame height)
 			if (this.absoluteFaceSize == 0)
 				{
@@ -194,29 +195,18 @@ public class FaceMapping extends PApplet {
 					
 					// The face area that was detected in greyscale
 					Mat greyROI = grayFrame.submat(facesArray[i]);
-					
+					detectedFace = new DetectedFace(frame.submat(facesArray[i]));
+
 					// The rectangular bounds on the face area
 					MatOfRect facesROI = new MatOfRect(facesArray[i]);
 					
 					Imgcodecs.imwrite("Captured Images//Faces//FaceROI_" + i + ".png", greyROI);
 					
-					// eyes_cascade.detectMultiScale(greyROI, facesROI,1.1, 3,
-					// 0, new Size(50d,50d), facesArray[i].size());
-					//
-					// Rect[ ] eyesArray = facesROI.toArray();
-					//
-					// for (int j = 0; j < eyesArray.length; j++)
-					// {
-					// Imgproc.rectangle(frame, eyesArray[i].tl(),
-					// eyesArray[i].br(), new Scalar(255, 0, 0, 255),
-					// 1);
-					//
-					//
-					// }
-					
 					searchForEyes(greyROI, facesArray[i]);
 					searchForMouth(greyROI, facesROI, facesArray[i]);
 				}
+
+			return detectedFace;
 		}
 
 	private void searchForEyes(Mat greyFaceSubMat, Rect detectedFace)
