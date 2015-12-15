@@ -24,28 +24,36 @@ import processing.core.PImage;
 
 
 public class FaceMapping extends PApplet {
-	
-	private VideoCapture	camera				= new VideoCapture();
-													
-	private Mat						frame					= new Mat();
-													
-	private double				cv_width;
-	private double				cv_height;
-								
-	private int						absoluteFaceSize;
-								
+
+	/**
+	 * Drawing modes: WEBCAM shows the camera input
+	 *                TEXTURE shows the current texture
+	 *                HEAD shows the 3d head with the face
+	 */
+	private enum DrawingMode { WEBCAM, TEXTURE, HEAD }
+
+	private VideoCapture camera = new VideoCapture();
+
+	private Mat frame = new Mat();
+
+	private double cv_width;
+	private double cv_height;
+
+	private int	absoluteFaceSize;
+
 	private PImage				img;
-								
-	private String				face_cascade_name		= "CascadeClassifiers\\haarcascade_frontalface_alt.xml";
-	private String				eyes_cascade_name		= "CascadeClassifiers\\haarcascade_eye_tree_eyeglasses.xml";
-	private String				mouth_cascade_name	= "CascadeClassifiers\\haarcascade_smile.xml";
-													
-	private CascadeClassifier	face_cascade		= new CascadeClassifier();
-	private CascadeClassifier	eyes_cascade		= new CascadeClassifier();
-	private CascadeClassifier	mouth_cascade		= new CascadeClassifier();
-													
-	boolean						aTest				= false;
-													
+	private DetectedFace	detectedFace;
+	private DrawingMode   drawingMode = DrawingMode.WEBCAM;
+
+	private String face_cascade_name	= "CascadeClassifiers\\haarcascade_frontalface_alt.xml";
+	private String eyes_cascade_name	= "CascadeClassifiers\\haarcascade_eye_tree_eyeglasses.xml";
+	private String mouth_cascade_name	= "CascadeClassifiers\\haarcascade_smile.xml";
+
+	private CascadeClassifier	face_cascade	= new CascadeClassifier();
+	private CascadeClassifier	eyes_cascade	= new CascadeClassifier();
+	private CascadeClassifier	mouth_cascade	= new CascadeClassifier();
+
+	boolean aTest	= false;
 													
 	public void settings( )
 		{
@@ -96,7 +104,7 @@ public class FaceMapping extends PApplet {
 					System.err.println("Exiting application: Cannot find face classifer.");
 					System.exit(2);
 				}
-				
+
 			if (eyes_cascade.load(eyes_cascade_name))
 				{
 					System.out.println("Succeded loading eyes_cascade_name.xml");
@@ -107,7 +115,7 @@ public class FaceMapping extends PApplet {
 					System.err.println("Exiting application: Cannot find eyes classifer.");
 					System.exit(2);
 				}
-				
+
 			if (mouth_cascade.load(mouth_cascade_name))
 				{
 					System.out.println("Succeded loading profile_cascade_name.xml");
@@ -121,23 +129,28 @@ public class FaceMapping extends PApplet {
 		}
 		
 		
-	public void draw( )
+	public void draw()
 		{
 			if (!aTest)
 				{
 					camera.read(frame); // Read the frame from the camera
 				}
-				
-			DetectedFace face = detectFace(frame); // Detect the face
-			
-			
-			img = new PImage(toBufferedImage(frame)); // Convert the frame with
-			                                          // the detected face to
-			                                          // a PImage
-			image(img, 0, 0); // Display that image at (0,0)
 
-			if (face != null)
-				image(face.toPImage(), 0, 0);
+			if (img != null)
+				image(img, 0, 0); // Display that image at (0,0)
+
+			if (detectedFace != null)
+				image(detectedFace.toPImage(), 0, 0);
+
+			update();
+		}
+
+	public void update()
+		{
+			detectedFace = detectFace(frame); // Detect the face
+
+			// Converts the frame with the detected face to a PImage
+			img = new PImage(toBufferedImage(frame));
 		}
 		
 		
