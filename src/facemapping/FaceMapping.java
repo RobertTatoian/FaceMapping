@@ -6,8 +6,13 @@ import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
 
-import org.opencv.core.*;
+import org.opencv.core.Core;
+import org.opencv.core.Rect;
+import org.opencv.core.Scalar;
+import org.opencv.core.Size;
 import org.opencv.imgcodecs.Imgcodecs;
+import org.opencv.core.Mat;
+import org.opencv.core.MatOfRect;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.objdetect.CascadeClassifier;
 import org.opencv.objdetect.Objdetect;
@@ -65,7 +70,7 @@ public class FaceMapping extends PApplet {
 				}
 			else
 				{
-					frame = Imgcodecs.imread("Test Images\\Chimp.jpg");
+					frame = Imgcodecs.imread("Test Images\\Lenna.png");
 					System.out.println("The width of the camera being used is: " + frame.cols());
 					System.out.println("The height of the camera being used is: " + frame.rows());
 					size(frame.cols(), frame.rows());
@@ -131,6 +136,7 @@ public class FaceMapping extends PApplet {
 			                                          // a PImage
 			image(img, 0, 0); // Display that image at (0,0)
 			
+			
 		}
 		
 		
@@ -142,16 +148,16 @@ public class FaceMapping extends PApplet {
 	 */
 	private void detectFace(Mat frame)
 		{
-
-			// init
+			
+			// Initialize
 			MatOfRect faces = new MatOfRect();
 			Mat grayFrame = new Mat();
-
+			
 			// convert the frame in gray scale
 			Imgproc.cvtColor(frame, grayFrame, Imgproc.COLOR_BGR2GRAY);
 			// equalize the frame histogram to improve the result
 			Imgproc.equalizeHist(grayFrame, grayFrame);
-
+			
 			// compute minimum face size (20% of the frame height)
 			if (this.absoluteFaceSize == 0)
 				{
@@ -161,7 +167,7 @@ public class FaceMapping extends PApplet {
 							this.absoluteFaceSize = Math.round(height * 0.2f);
 						}
 				}
-
+				
 			// detect faces
 			try
 				{
@@ -174,10 +180,10 @@ public class FaceMapping extends PApplet {
 					e.printStackTrace();
 					System.exit(-1);
 				}
-
+				
 			// each rectangle in faces is a face
 			Rect[ ] facesArray = faces.toArray();
-
+			
 			for (int i = 0; i < facesArray.length; i++)
 				{
 					/*
@@ -185,50 +191,74 @@ public class FaceMapping extends PApplet {
 					 * and br() in the next argument is most likely bottom right
 					 */
 					Imgproc.rectangle(frame, facesArray[i].tl(), facesArray[i].br(), new Scalar(0, 255, 0, 255), 1);
-
-					//The face area that was detected in greyscale
+					
+					// The face area that was detected in greyscale
 					Mat greyROI = grayFrame.submat(facesArray[i]);
-
-					//The rectangular bounds on the face area
+					
+					// The rectangular bounds on the face area
 					MatOfRect facesROI = new MatOfRect(facesArray[i]);
-
+					
+					Imgcodecs.imwrite("Captured Images//Faces//FaceROI_" + i + ".png", greyROI);
+					
+					// eyes_cascade.detectMultiScale(greyROI, facesROI,1.1, 3,
+					// 0, new Size(50d,50d), facesArray[i].size());
+					//
+					// Rect[ ] eyesArray = facesROI.toArray();
+					//
+					// for (int j = 0; j < eyesArray.length; j++)
+					// {
+					// Imgproc.rectangle(frame, eyesArray[i].tl(),
+					// eyesArray[i].br(), new Scalar(255, 0, 0, 255),
+					// 1);
+					//
+					//
+					// }
+					
 					searchForEyes(greyROI, facesArray[i]);
-
-					mouth_cascade.detectMultiScale(greyROI, facesROI,1.5, 3, 0, new Size(50d,50d), facesArray[i].size());
-
-					Rect[ ] mouthRect = facesROI.toArray();
-
-					for (int j = 0; j < mouthRect.length; j++)
-						{
-							mouthRect[j].x += facesArray[i].x;
-							mouthRect[j].y += facesArray[i].y;
-							Imgproc.rectangle(frame, mouthRect[j].tl(), mouthRect[j].br(), new Scalar(255, 255, 0, 255),
-							        1);
-						}
-
+					searchForMouth(greyROI, facesROI, facesArray[i]);
 				}
 		}
 
-		private void searchForEyes(Mat greyFaceSubMat, Rect detectedFace)
-			{
-
-				MatOfRect eyes = new MatOfRect();
-				eyes_cascade.detectMultiScale(greyFaceSubMat, eyes);
-				Rect[ ] eyesArray = eyes.toArray();
-
-				for (int j = 0; j < eyesArray.length; j++)
-					{
-						Rect e = eyesArray[j];
-						e.x += detectedFace.x;
-						e.y += detectedFace.y;
-
-						System.out.println(e.tl().x + " .. " + e.br().x);
-
-						Imgproc.rectangle(frame, e.tl(), e.br(),
-															new Scalar(255, 0, 0, 255), 1);
-					}
-			}
-
+	private void searchForEyes(Mat greyFaceSubMat, Rect detectedFace)
+		{
+			
+			MatOfRect eyes = new MatOfRect();
+			eyes_cascade.detectMultiScale(greyFaceSubMat, eyes);
+			Rect[ ] eyesArray = eyes.toArray();
+			
+			for (int j = 0; j < eyesArray.length; j++)
+				{
+					Rect e = eyesArray[j];
+					e.x += detectedFace.x;
+					e.y += detectedFace.y;
+					
+					Imgproc.rectangle(frame, e.tl(), e.br(), new Scalar(255, 0, 0, 255), 1);
+				}
+		}
+		
+		
+	private void searchForMouth(Mat greyFaceSubMat, MatOfRect rectOfFace, Rect detectedFaceRect)
+		{
+			
+			
+			mouth_cascade.detectMultiScale(greyFaceSubMat, rectOfFace, 1.5, 3, 0, new Size(50d, 50d),
+			        detectedFaceRect.size());
+					
+			Rect[ ] mouthRect = rectOfFace.toArray();
+			
+			for (int j = 0; j < mouthRect.length; j++)
+				{
+					Imgcodecs.imwrite("Captured Images//Mouths//Mouth ROI_" + j + ".png", greyFaceSubMat);
+					
+					mouthRect[j].x += detectedFaceRect.x;
+					mouthRect[j].y += detectedFaceRect.y;
+					
+					Imgproc.rectangle(frame, mouthRect[j].tl(), mouthRect[j].br(), new Scalar(255, 255, 0, 255), 1);
+				}
+				
+		}
+		
+		
 	/*
 	 * Converts the Mat object to an Image object so that it can be encapsulated
 	 * by a PImage to work with processing. Found at:
@@ -252,4 +282,38 @@ public class FaceMapping extends PApplet {
 			return image;
 		}
 
+
+	/*
+	 * REQUIRED TO RUN BOTH PROCESSING AND OPENCV!
+	 */
+	public static void main(String _args[])
+		{
+			// Call system to load the OpenCV library
+			System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
+			// Create the Processing window
+			PApplet.main(new String[ ] { facemapping.FaceMapping.class.getName() });
+			
+		}
+		
+		
+	@Override
+	public void exitActual( )
+		{
+			try
+				{
+					camera.release();
+					System.exit(0);
+				}
+			catch (Exception e)
+				{
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			catch (StackOverflowError soe)
+				{
+					System.err.println("!!!Stack Overflow Error!!!");
+					soe.printStackTrace();
+				}
+		}
+		
 }
