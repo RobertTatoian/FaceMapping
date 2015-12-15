@@ -20,19 +20,19 @@ import processing.core.PImage;
 
 public class FaceMapping extends PApplet {
 	
-	private VideoCapture		camera				= new VideoCapture();
+	private VideoCapture	camera				= new VideoCapture();
 													
-	private Mat					frame				= new Mat();
+	private Mat						frame					= new Mat();
 													
 	private double				cv_width;
 	private double				cv_height;
 								
-	private int					absoluteFaceSize;
+	private int						absoluteFaceSize;
 								
 	private PImage				img;
 								
-	private String				face_cascade_name	= "CascadeClassifiers\\haarcascade_frontalface_alt.xml";
-	private String				eyes_cascade_name	= "CascadeClassifiers\\haarcascade_eye_tree_eyeglasses.xml";
+	private String				face_cascade_name		= "CascadeClassifiers\\haarcascade_frontalface_alt.xml";
+	private String				eyes_cascade_name		= "CascadeClassifiers\\haarcascade_eye_tree_eyeglasses.xml";
 	private String				mouth_cascade_name	= "CascadeClassifiers\\haarcascade_smile.xml";
 													
 	private CascadeClassifier	face_cascade		= new CascadeClassifier();
@@ -222,6 +222,8 @@ public class FaceMapping extends PApplet {
 						e.x += detectedFace.x;
 						e.y += detectedFace.y;
 
+						System.out.println(e.tl().x + " .. " + e.br().x);
+
 						Imgproc.rectangle(frame, e.tl(), e.br(),
 															new Scalar(255, 0, 0, 255), 1);
 					}
@@ -249,17 +251,5 @@ public class FaceMapping extends PApplet {
 			System.arraycopy(b, 0, targetPixels, 0, b.length);
 			return image;
 		}
-		
-		
-	/*
-	 * REQUIRED TO RUN BOTH PROCESSING AND OPENCV!
-	 */
-	public static void main(String _args[])
-		{
-			// Call system to load the OpenCV library
-			System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
-			// Create the Processing window
-			PApplet.main(new String[ ] { facemapping.FaceMapping.class.getName() });
-			
-		}
+
 }
