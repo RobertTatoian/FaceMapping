@@ -26,6 +26,10 @@ public class HeadWithFace /* extends SimpleGraphicsObject */ {
 			this.applet = applet;
 		}
 
+	public void updateFace(DetectedFace face) {
+		detectedFaceTexture = face.toPImage();
+	}
+
 
 	public void draw()
 		{
@@ -63,13 +67,20 @@ public class HeadWithFace /* extends SimpleGraphicsObject */ {
 			applet.vertex(-1f, -1f, -1f);
 			applet.vertex( 1f, -1f, -1f);
 
-			applet.fill(100, 0, 0);
+			applet.endShape();
+			applet.beginShape(PApplet.QUADS);
 
 			// Front side
-			applet.vertex( 1f,  1f, 1f);
-			applet.vertex(-1f,  1f, 1f);
-			applet.vertex(-1f, -1f, 1f);
-			applet.vertex( 1f, -1f, 1f);
+			applet.textureMode(applet.NORMAL);
+			applet.texture(detectedFaceTexture);
+
+			applet.vertex( 1f,  1f, 1f, 1, 1);
+			applet.vertex(-1f,  1f, 1f, 0, 1);
+			applet.vertex(-1f, -1f, 1f, 0, 0);
+			applet.vertex( 1f, -1f, 1f, 1, 0);
+
+			applet.endShape();
+			applet.beginShape(PApplet.QUADS);
 
 			applet.fill(0, 100, 100);
 

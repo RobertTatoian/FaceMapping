@@ -161,6 +161,9 @@ public class FaceMapping extends PApplet {
 
 			detectedFace = detectFace(frame); // Detect the face
 
+			if (detectedFace != null)
+				head.updateFace(detectedFace);
+
 			// Converts the frame with the detected face to a PImage
 			img = new PImage(toBufferedImage(frame));
 		}
