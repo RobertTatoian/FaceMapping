@@ -25,13 +25,6 @@ import processing.core.PImage;
 
 public class FaceMapping extends PApplet {
 
-	/**
-	 * Drawing modes: WEBCAM shows the camera input
-	 *                TEXTURE shows the current texture
-	 *                HEAD shows the 3d head with the face
-	 */
-	private enum DrawingMode { WEBCAM, TEXTURE, HEAD }
-
 	private VideoCapture camera = new VideoCapture();
 
 	private Mat frame = new Mat();
@@ -44,7 +37,6 @@ public class FaceMapping extends PApplet {
 	private PImage				img;
 	private DetectedFace	detectedFace;
 	private HeadWithFace  head;
-	private DrawingMode   drawingMode = DrawingMode.HEAD;
 
 	private String face_cascade_name	= "CascadeClassifiers\\haarcascade_frontalface_alt.xml";
 	private String eyes_cascade_name	= "CascadeClassifiers\\haarcascade_eye_tree_eyeglasses.xml";
@@ -305,17 +297,12 @@ public class FaceMapping extends PApplet {
 			switch (key)
 				{
 				case '1':
-					drawingMode = DrawingMode.WEBCAM;
-					break;
-				case '2':
-					drawingMode = DrawingMode.HEAD;
-				case '!': // SHIFT 1
 					camera(width/2f, height/2f, (height/2f)/tan(PI*30f/180f),width/2f,height/2f, 0, 0, 1, 0);
 					break;
-				case '@': // SHIFT 2
+				case '2': // SHIFT 2
 					camera(width/2f, height/1f, (height/1f)/tan(PI*30f/180f),width/2f,height/2f, 0, 0, 1, 0);
 					break;
-				case '#':
+				case '3':
 					camera(width/2f, height*2.5f, (height/3f)/tan(PI*30f/180f),width/2f,height/2f, 0, 0, 1, 0);
 					break;
 				}
