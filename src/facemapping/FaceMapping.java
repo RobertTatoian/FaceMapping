@@ -43,7 +43,8 @@ public class FaceMapping extends PApplet {
 
 	private PImage				img;
 	private DetectedFace	detectedFace;
-	private DrawingMode   drawingMode = DrawingMode.WEBCAM;
+	private HeadWithFace  head;
+	private DrawingMode   drawingMode = DrawingMode.HEAD;
 
 	private String face_cascade_name	= "CascadeClassifiers\\haarcascade_frontalface_alt.xml";
 	private String eyes_cascade_name	= "CascadeClassifiers\\haarcascade_eye_tree_eyeglasses.xml";
@@ -68,7 +69,7 @@ public class FaceMapping extends PApplet {
 							cv_height = camera.get(Videoio.CV_CAP_PROP_FRAME_HEIGHT);
 							System.out.println("The width of the camera being used is: " + (int)cv_width);
 							System.out.println("The height of the camera being used is: " + (int)cv_height);
-							size((int)cv_width, (int)cv_height);
+							size((int)cv_width, (int)cv_height, P3D);
 						}
 					else
 						{
@@ -81,7 +82,7 @@ public class FaceMapping extends PApplet {
 					frame = Imgcodecs.imread("Test Images\\Lenna.png");
 					System.out.println("The width of the camera being used is: " + frame.cols());
 					System.out.println("The height of the camera being used is: " + frame.rows());
-					size(frame.cols(), frame.rows());
+					size(frame.cols(), frame.rows(), P3D);
 				}
 		}
 		
@@ -126,27 +127,38 @@ public class FaceMapping extends PApplet {
 					System.err.println("Exiting application: Cannot find profile classifer.");
 					System.exit(2);
 				}
+
+			head = new HeadWithFace(this);
 		}
 		
 		
 	public void draw()
 		{
-			if (!aTest)
-				{
-					camera.read(frame); // Read the frame from the camera
-				}
-
-			if (img != null)
-				image(img, 0, 0); // Display that image at (0,0)
-
-			if (detectedFace != null)
-				image(detectedFace.toPImage(), 0, 0);
-
 			update();
+
+			background(200, 200, 200);
+		//	if (drawingMode == DrawingMode.WEBCAM)
+				{
+					if (img != null)
+						image(img, 0, 0); // Display that image at (0,0)
+
+					if (detectedFace != null)
+						image(detectedFace.toPImage(), 0, 0);
+				}
+   //   else if (drawingMode == DrawingMode.HEAD)
+				{
+					head.draw();
+					//rect(0, 0, 10, 10);
+				}
 		}
 
 	public void update()
 		{
+			if (!aTest)
+			{
+				camera.read(frame); // Read the frame from the camera
+			}
+
 			detectedFace = detectFace(frame); // Detect the face
 
 			// Converts the frame with the detected face to a PImage
@@ -283,6 +295,27 @@ public class FaceMapping extends PApplet {
 			final byte[ ] targetPixels = ((DataBufferByte)image.getRaster().getDataBuffer()).getData();
 			System.arraycopy(b, 0, targetPixels, 0, b.length);
 			return image;
+		}
+
+	public void keyReleased()
+		{
+			switch (key)
+				{
+				case '1':
+					drawingMode = DrawingMode.WEBCAM;
+					break;
+				case '2':
+					drawingMode = DrawingMode.HEAD;
+				case '!': // SHIFT 1
+					camera(width/2f, height/2f, (height/2f)/tan(PI*30f/180f),width/2f,height/2f, 0, 0, 1, 0);
+					break;
+				case '@': // SHIFT 2
+					camera(width/2f, height/1f, (height/1f)/tan(PI*30f/180f),width/2f,height/2f, 0, 0, 1, 0);
+					break;
+				case '#':
+					camera(width/2f, height*2.5f, (height/3f)/tan(PI*30f/180f),width/2f,height/2f, 0, 0, 1, 0);
+					break;
+				}
 		}
 
 
