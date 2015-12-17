@@ -1,9 +1,12 @@
 package facemapping;
 
+import Abstract.GraphicObject;
+import Abstract.SimpleGraphicObject;
 import processing.core.PApplet;
 import processing.core.PImage;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
-public class HeadWithFace /* extends SimpleGraphicsObject */ {
+public class HeadWithFace extends SimpleGraphicObject {
 
 	/** size of the texture **/
 	private float width, height;
@@ -30,11 +33,15 @@ public class HeadWithFace /* extends SimpleGraphicsObject */ {
 		detectedFaceTexture = face.toPImage();
 	}
 
+	@Override
+	public boolean isInside(float x, float y) {
+		throw new NotImplementedException();
+	}
 
 	public void draw()
 		{
 			applet.pushMatrix();
-			applet.scale(100f, -100f, 100f);
+			applet.scale(100f, 100f, 100f);
 
 			applet.stroke(1f);
 			applet.strokeWeight(.01f);
@@ -105,4 +112,29 @@ public class HeadWithFace /* extends SimpleGraphicsObject */ {
 			applet.endShape();
 			applet.popMatrix();
 		}
+
+	@Override
+	public void update() {
+
+	}
+
+	@Override
+	public GraphicObject getParent() {
+		return null;
+	}
+
+	@Override
+	public float getRotation() {
+		return 0;
+	}
+
+	@Override
+	public float getTranslateX() {
+		return 0;
+	}
+
+	@Override
+	public float getTranslateY() {
+		return 0;
+	}
 }

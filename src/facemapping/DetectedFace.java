@@ -30,9 +30,11 @@ public class DetectedFace {
 						{
 							// i = row = y coordinate, j = column = x coordinate
 							double[] colorValues = colorFaceROI.get(i, j);
-							int r = (int)(colorValues[0]),
+
+							// apparently the colors are bgr, not rgb
+							int r = (int)(colorValues[2]),
 									g = (int)(colorValues[1]),
-									b = (int)(colorValues[2]);
+									b = (int)(colorValues[0]);
 
 							int color = 0xFF000000 | (r << 16) | (g << 8) | b;
 							this.colorFaceImage.set(j, i, color);

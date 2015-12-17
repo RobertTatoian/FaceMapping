@@ -128,20 +128,30 @@ public class FaceMapping extends PApplet {
 		{
 			update();
 
-			background(200, 200, 200);
-		//	if (drawingMode == DrawingMode.WEBCAM)
-				{
-					if (img != null)
-						image(img, 0, 0); // Display that image at (0,0)
+			pushMatrix();
+			scale(1, -1, 1);
+			translate(0, -500, 0);
 
-					if (detectedFace != null)
-						image(detectedFace.toPImage(), 0, 0);
-				}
-   //   else if (drawingMode == DrawingMode.HEAD)
-				{
-					head.draw();
-					//rect(0, 0, 10, 10);
-				}
+			drawAxis();
+
+			background(200, 200, 200);
+			if (img != null)
+				image(img, 0, 0); // Display that image at (0,0)
+
+			if (detectedFace != null)
+				image(detectedFace.toPImage(), 0, 0);
+			head.draw();
+			popMatrix();
+
+		}
+
+	private void drawAxis()
+		{
+			strokeWeight(10f);
+
+			// y axis
+			stroke(0, 255, 0);
+			line(0, 0, 0, 0, 1, 0);
 		}
 
 	public void update()
