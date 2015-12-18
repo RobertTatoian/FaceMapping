@@ -137,7 +137,7 @@ public class FaceDetector {
 			 * Note tl() in the second argument is most likely top left
 			 * and br() in the next argument is most likely bottom right
 			 */
-	//		Imgproc.rectangle(frame, face.tl(), face.br(), new Scalar(0, 255, 0, 255), 1);
+			Imgproc.rectangle(frame, face.tl(), face.br(), new Scalar(0, 255, 0, 255), 1);
 
 			// The face area that was detected in greyscale
 			Mat greyROI = grayFrame.submat(face);
@@ -168,9 +168,6 @@ public class FaceDetector {
 					continue;
 				}
 
-				// A face needs two eyes
-				// TODO remove `frame.submat(face)` from constructor
-				//detectedFace = new DetectedFace(frame.submat(face));
 				faceRect = face;
 				break;
 			}
@@ -178,11 +175,10 @@ public class FaceDetector {
 
 		for (Rect profile : profileArray)
 		{
-	//		Imgproc.rectangle(frame, profile.tl(), profile.br(), new Scalar(0, 0, 255, 255), 1);
+			Imgproc.rectangle(frame, profile.tl(), profile.br(), new Scalar(0, 0, 255, 255), 1);
 			Mat greyROI = grayFrame.submat(profile);
 			searchForEyes(greyROI, profile);
 
-			// Right now the DetectedFace class doesn't handle profile faces
 		}
 
 		if (profileArray.length == 0 && faceRect != null)
@@ -220,7 +216,7 @@ public class FaceDetector {
 							(float) eyeSize.width,
 							(float) eyeSize.height };
 
-	//		Imgproc.rectangle(frame, e.tl(), e.br(), new Scalar(255, 0, 0, 255), 1);
+			Imgproc.rectangle(frame, e.tl(), e.br(), new Scalar(255, 0, 0, 255), 1);
 		}
 		return eyeCoordinates;
 	}
@@ -240,7 +236,7 @@ public class FaceDetector {
 			mouthRect[j].x += detectedFaceRect.x;
 			mouthRect[j].y += detectedFaceRect.y;
 
-	//		Imgproc.rectangle(frame, mouthRect[j].tl(), mouthRect[j].br(), new Scalar(255, 255, 0, 255), 1);
+			Imgproc.rectangle(frame, mouthRect[j].tl(), mouthRect[j].br(), new Scalar(255, 255, 0, 255), 1);
 		}
 	}
 
