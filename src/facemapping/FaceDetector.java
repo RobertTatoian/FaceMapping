@@ -38,6 +38,8 @@ public class FaceDetector {
 	private double cvWidth;
 	private double cvHeight;
 
+	private DetectedFace detectedFace = new DetectedFace(null);
+
 	public FaceDetector(PApplet applet)
 		{
 			this.camera = new VideoCapture();
@@ -87,7 +89,6 @@ public class FaceDetector {
 		MatOfRect faces = new MatOfRect();
 		MatOfRect profiles = new MatOfRect();
 		Mat grayFrame = new Mat();
-		DetectedFace detectedFace = null;
 
 		// convert the frame in gray scale
 		Imgproc.cvtColor(frame, grayFrame, Imgproc.COLOR_BGR2GRAY);
@@ -128,13 +129,15 @@ public class FaceDetector {
 		Rect[] facesArray = faces.toArray();
 		Rect[] profileArray = profiles.toArray();
 
+		Rect faceRect = null;
+		float[] leftEye = null, rightEye = null;
 		for (Rect face : facesArray)
 		{
 			/*
 			 * Note tl() in the second argument is most likely top left
 			 * and br() in the next argument is most likely bottom right
 			 */
-			Imgproc.rectangle(frame, face.tl(), face.br(), new Scalar(0, 255, 0, 255), 1);
+	//		Imgproc.rectangle(frame, face.tl(), face.br(), new Scalar(0, 255, 0, 255), 1);
 
 			// The face area that was detected in greyscale
 			Mat greyROI = grayFrame.submat(face);
@@ -147,27 +150,55 @@ public class FaceDetector {
 
 			if (eyeCoordinates.length == 2)
 			{
+				float max = Math.max(eyeCoordinates[0][3], eyeCoordinates[1][3]);
+				float min = Math.min(eyeCoordinates[0][3], eyeCoordinates[1][3]);
+				if (max / min > 1.5 )
+				{
+					// If one eye is much bigger than the other, then the eyes weren't properly detected
+					continue;
+				}
+
 				float x1 = eyeCoordinates[0][0], x2 = eyeCoordinates[1][0];
-				float[] leftEye = x1 < x2 ? eyeCoordinates[0] : eyeCoordinates[1];
-				float[] rightEye = x1 < x2 ? eyeCoordinates[1] : eyeCoordinates[0];
+				leftEye = x1 < x2 ? eyeCoordinates[0] : eyeCoordinates[1];
+				rightEye = x1 < x2 ? eyeCoordinates[1] : eyeCoordinates[0];
+
+				if (leftEye[0] + leftEye[3] / 2 > rightEye[0] - rightEye[3])
+				{
+					// then the eyes overlap, so the eyes weren't properly detected
+					continue;
+				}
 
 				// A face needs two eyes
 				// TODO remove `frame.submat(face)` from constructor
-				detectedFace = new DetectedFace(frame.submat(face));
-				detectedFace.updateFrontalFace(frame.submat(face), leftEye, rightEye);
+				//detectedFace = new DetectedFace(frame.submat(face));
+				faceRect = face;
+				break;
 			}
 		}
 
 		for (Rect profile : profileArray)
 		{
-			Imgproc.rectangle(frame, profile.tl(), profile.br(), new Scalar(0, 0, 255, 255), 1);
+	//		Imgproc.rectangle(frame, profile.tl(), profile.br(), new Scalar(0, 0, 255, 255), 1);
 			Mat greyROI = grayFrame.submat(profile);
 			searchForEyes(greyROI, profile);
+
+			// Right now the DetectedFace class doesn't handle profile faces
+		}
+
+		if (profileArray.length == 0 && faceRect != null)
+		{
+			detectedFace.updateFrontalFace(frame.submat(faceRect), leftEye, rightEye);
 		}
 
 		return detectedFace;
 	}
 
+	/**
+	 * The coordinates of the eyes are relative to the detectedFace
+	 * @param greyFaceSubMat
+	 * @param detectedFace
+	 * @return
+	 */
 	private float[][] searchForEyes(Mat greyFaceSubMat, Rect detectedFace)
 	{
 		MatOfRect eyes = new MatOfRect();
@@ -184,10 +215,12 @@ public class FaceDetector {
 			Size eyeSize = e.size();
 
 			eyeCoordinates[j] = new float[] {
-							(float)(e.x + eyeSize.width / 2),
-							(float)(e.y + eyeSize.height / 2) };
+							(float)(e.x  - detectedFace.x + eyeSize.width / 2),
+							(float)(e.y - detectedFace.y + eyeSize.height / 2),
+							(float) eyeSize.width,
+							(float) eyeSize.height };
 
-			Imgproc.rectangle(frame, e.tl(), e.br(), new Scalar(255, 0, 0, 255), 1);
+	//		Imgproc.rectangle(frame, e.tl(), e.br(), new Scalar(255, 0, 0, 255), 1);
 		}
 		return eyeCoordinates;
 	}
@@ -207,7 +240,7 @@ public class FaceDetector {
 			mouthRect[j].x += detectedFaceRect.x;
 			mouthRect[j].y += detectedFaceRect.y;
 
-			Imgproc.rectangle(frame, mouthRect[j].tl(), mouthRect[j].br(), new Scalar(255, 255, 0, 255), 1);
+	//		Imgproc.rectangle(frame, mouthRect[j].tl(), mouthRect[j].br(), new Scalar(255, 255, 0, 255), 1);
 		}
 	}
 

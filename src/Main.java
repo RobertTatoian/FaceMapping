@@ -2,6 +2,7 @@ import facemapping.DetectedFace;
 import facemapping.FaceDetector;
 import org.opencv.core.Core;
 import processing.core.PApplet;
+import processing.core.PImage;
 
 /**
  * Displays and manages 3 frames:
@@ -30,7 +31,10 @@ public class Main extends PApplet {
 			image(faceDetector.getFrame(), 0, 0);
 
 			if (detectedFace != null)
-				image(detectedFace.toPImage(), 0, 0);
+			{
+				PImage texture = detectedFace.toPImage();
+				image(texture, 0, 0, (200.0f / texture.height) * texture.width, 200);
+			}
 		}
 
 	public void update()
