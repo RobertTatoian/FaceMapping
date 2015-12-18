@@ -138,13 +138,24 @@ public class FaceDetector {
 
 			// The face area that was detected in greyscale
 			Mat greyROI = grayFrame.submat(face);
-			detectedFace = new DetectedFace(frame.submat(face));
 
 			// The rectangular bounds on the face area
 			MatOfRect facesROI = new MatOfRect(face);
 
-			searchForEyes(greyROI, face);
+			float[][] eyeCoordinates = searchForEyes(greyROI, face);
 			searchForMouth(greyROI, facesROI, face);
+
+			if (eyeCoordinates.length == 2)
+			{
+				float x1 = eyeCoordinates[0][0], x2 = eyeCoordinates[1][0];
+				float[] leftEye = x1 < x2 ? eyeCoordinates[0] : eyeCoordinates[1];
+				float[] rightEye = x1 < x2 ? eyeCoordinates[1] : eyeCoordinates[0];
+
+				// A face needs two eyes
+				// TODO remove `frame.submat(face)` from constructor
+				detectedFace = new DetectedFace(frame.submat(face));
+				detectedFace.updateFrontalFace(frame.submat(face), leftEye, rightEye);
+			}
 		}
 
 		for (Rect profile : profileArray)
@@ -157,20 +168,28 @@ public class FaceDetector {
 		return detectedFace;
 	}
 
-	private void searchForEyes(Mat greyFaceSubMat, Rect detectedFace)
+	private float[][] searchForEyes(Mat greyFaceSubMat, Rect detectedFace)
 	{
 		MatOfRect eyes = new MatOfRect();
 		eyesCascade.detectMultiScale(greyFaceSubMat, eyes);
 		Rect[ ] eyesArray = eyes.toArray();
+
+		float[][] eyeCoordinates = new float[eyesArray.length][];
 
 		for (int j = 0; j < eyesArray.length; j++)
 		{
 			Rect e = eyesArray[j];
 			e.x += detectedFace.x;
 			e.y += detectedFace.y;
+			Size eyeSize = e.size();
+
+			eyeCoordinates[j] = new float[] {
+							(float)(e.x + eyeSize.width / 2),
+							(float)(e.y + eyeSize.height / 2) };
 
 			Imgproc.rectangle(frame, e.tl(), e.br(), new Scalar(255, 0, 0, 255), 1);
 		}
+		return eyeCoordinates;
 	}
 
 

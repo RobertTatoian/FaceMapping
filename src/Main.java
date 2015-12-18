@@ -35,7 +35,11 @@ public class Main extends PApplet {
 
 	public void update()
 		{
-			detectedFace = faceDetector.detectFace();
+			DetectedFace face = faceDetector.detectFace();
+			if (face != null)
+			{
+				detectedFace = face;
+			}
 		}
 
 	public void exitActual()
