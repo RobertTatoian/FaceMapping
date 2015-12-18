@@ -32,7 +32,7 @@ public class FaceMapping extends PApplet {
 	private double cv_width;
 	private double cv_height;
 
-	private int	absoluteFaceSize;
+	private int absoluteFaceSize;
 
 	private PImage				img;
 	private DetectedFace	detectedFace;
@@ -42,11 +42,13 @@ public class FaceMapping extends PApplet {
 	private String eyes_cascade_name	= "CascadeClassifiers\\haarcascade_eye_tree_eyeglasses.xml";
 	private String mouth_cascade_name	= "CascadeClassifiers\\haarcascade_smile.xml";
 
-	private CascadeClassifier	face_cascade	= new CascadeClassifier();
-	private CascadeClassifier	eyes_cascade	= new CascadeClassifier();
-	private CascadeClassifier	mouth_cascade	= new CascadeClassifier();
+	private CascadeClassifier face_cascade	= new CascadeClassifier();
+	private CascadeClassifier eyes_cascade	= new CascadeClassifier();
+	private CascadeClassifier mouth_cascade	= new CascadeClassifier();
 
 	boolean aTest	= false;
+
+	private float centerY = 0;
 													
 	public void settings( )
 		{
@@ -121,7 +123,10 @@ public class FaceMapping extends PApplet {
 				}
 
 			head = new HeadWithFace(this);
+			centerY = height/2;
+			System.out.println(width + "'" + height);
 		}
+
 		
 		
 	public void draw()
@@ -129,17 +134,25 @@ public class FaceMapping extends PApplet {
 			update();
 
 			pushMatrix();
-			scale(1, -1, 1);
-			translate(0, -500, 0);
+			//scale(1, 1, 1);
+			//translate(0, -500, 0);
 
 			drawAxis();
+
+			camera(width/2, height/2, 416, width/2, centerY, 0, 0, 1, 0);
+			printCamera();
 
 			background(200, 200, 200);
 			if (img != null)
 				image(img, 0, 0); // Display that image at (0,0)
 
 			if (detectedFace != null)
-				image(detectedFace.toPImage(), 0, 0);
+				{
+					pushMatrix();
+					translate(0, 0, 1);
+					image(detectedFace.toPImage(), 0, 0);
+					popMatrix();
+				}
 			head.draw();
 			popMatrix();
 
@@ -302,7 +315,7 @@ public class FaceMapping extends PApplet {
 			return image;
 		}
 
-	public void keyReleased()
+	public void keyPressed()
 		{
 			switch (key)
 				{
@@ -313,7 +326,14 @@ public class FaceMapping extends PApplet {
 					camera(width/2f, height/1f, (height/1f)/tan(PI*30f/180f),width/2f,height/2f, 0, 0, 1, 0);
 					break;
 				case '3':
-					camera(width/2f, height*2.5f, (height/3f)/tan(PI*30f/180f),width/2f,height/2f, 0, 0, 1, 0);
+					camera(width/2f, -height*2.5f, -(height/3f)/tan(PI*30f/180f), width/2f,height/2f, 0, 0, 1, 0);
+					break;
+				case '+':
+					centerY += 10f;
+					break;
+				case '-':
+					centerY -= 10f;
+					//camera(width/2f, height/2f + eyeY, (height/2f)/tan(PI*30f/180f),width/2f,height/2f, 0, 0, 1, 0);
 					break;
 				}
 		}
