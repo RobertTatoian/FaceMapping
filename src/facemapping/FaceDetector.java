@@ -26,10 +26,12 @@ public class FaceDetector {
 	private String faceCascadeName = "CascadeClassifiers\\haarcascade_frontalface_alt.xml";
 	private String eyesCascadeName = "CascadeClassifiers\\haarcascade_eye_tree_eyeglasses.xml";
 	private String mouthCascadeName = "CascadeClassifiers\\haarcascade_smile.xml";
+	private String profileCascadeName = "CascadeClassifiers\\haarcascade_profileface.xml";
 
 	private CascadeClassifier faceCascade = new CascadeClassifier();
 	private CascadeClassifier	eyesCascade = new CascadeClassifier();
 	private CascadeClassifier	mouthCascade = new CascadeClassifier();
+	private CascadeClassifier	profileCascade = new CascadeClassifier();
 
 	private int	absoluteFaceSize;
 
@@ -45,6 +47,7 @@ public class FaceDetector {
 			faceCascade.load(faceCascadeName);
 			eyesCascade.load(eyesCascadeName);
 			mouthCascade.load(mouthCascadeName);
+			profileCascade.load(profileCascadeName);
 
 			initialize();
 		}
@@ -82,6 +85,7 @@ public class FaceDetector {
 	{
 		// Initialize
 		MatOfRect faces = new MatOfRect();
+		MatOfRect profiles = new MatOfRect();
 		Mat grayFrame = new Mat();
 		DetectedFace detectedFace = null;
 
@@ -103,45 +107,51 @@ public class FaceDetector {
 		// detect faces
 		try
 		{
-			this.faceCascade.detectMultiScale(grayFrame,
-																				faces,
-																				1.1,
-																				2,
+			this.faceCascade.detectMultiScale(grayFrame, faces, 1.1, 2,
 																				0 | Objdetect.CASCADE_SCALE_IMAGE,
 																				new Size(this.absoluteFaceSize,
 																								 this.absoluteFaceSize),
 																				new Size());
+			this.profileCascade.detectMultiScale(grayFrame, profiles, 1.1, 2,
+																					 0 | Objdetect.CASCADE_SCALE_IMAGE,
+																					 new Size(this.absoluteFaceSize,
+																										this.absoluteFaceSize),
+																					 new Size());
 		}
 		catch (Exception e)
 		{
 			System.err.println("There is a problem with face_cascade detection. Printing stack trace: ");
 			e.printStackTrace();
-			System.exit(-1);
 		}
 
 		// each rectangle in faces is a face
-		Rect[ ] facesArray = faces.toArray();
+		Rect[] facesArray = faces.toArray();
+		Rect[] profileArray = profiles.toArray();
 
-		for (int i = 0; i < facesArray.length; i++)
+		for (Rect face : facesArray)
 		{
 			/*
 			 * Note tl() in the second argument is most likely top left
 			 * and br() in the next argument is most likely bottom right
 			 */
-			Imgproc.rectangle(frame, facesArray[i].tl(), facesArray[i].br(), new Scalar(0, 255, 0, 255), 1);
+			Imgproc.rectangle(frame, face.tl(), face.br(), new Scalar(0, 255, 0, 255), 1);
 
 			// The face area that was detected in greyscale
-			Mat greyROI = grayFrame.submat(facesArray[i]);
-			detectedFace = new DetectedFace(frame.submat(facesArray[i]));
+			Mat greyROI = grayFrame.submat(face);
+			detectedFace = new DetectedFace(frame.submat(face));
 
 			// The rectangular bounds on the face area
-			MatOfRect facesROI = new MatOfRect(facesArray[i]);
+			MatOfRect facesROI = new MatOfRect(face);
 
-			Imgcodecs.imwrite("Captured Images//Faces//FaceROI_" + i + ".png",
-												greyROI);
+			searchForEyes(greyROI, face);
+			searchForMouth(greyROI, facesROI, face);
+		}
 
-			searchForEyes(greyROI, facesArray[i]);
-			searchForMouth(greyROI, facesROI, facesArray[i]);
+		for (Rect profile : profileArray)
+		{
+			Imgproc.rectangle(frame, profile.tl(), profile.br(), new Scalar(0, 0, 255, 255), 1);
+			Mat greyROI = grayFrame.submat(profile);
+			searchForEyes(greyROI, profile);
 		}
 
 		return detectedFace;
@@ -149,7 +159,6 @@ public class FaceDetector {
 
 	private void searchForEyes(Mat greyFaceSubMat, Rect detectedFace)
 	{
-
 		MatOfRect eyes = new MatOfRect();
 		eyesCascade.detectMultiScale(greyFaceSubMat, eyes);
 		Rect[ ] eyesArray = eyes.toArray();

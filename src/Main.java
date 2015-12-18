@@ -1,3 +1,4 @@
+import facemapping.DetectedFace;
 import facemapping.FaceDetector;
 import org.opencv.core.Core;
 import processing.core.PApplet;
@@ -9,7 +10,8 @@ import processing.core.PApplet;
  * 3. A 3d shape with the face texture mapped onto it
  */
 public class Main extends PApplet {
-	FaceDetector faceDetector;
+	private FaceDetector faceDetector;
+	private DetectedFace detectedFace;
 
 	public void settings()
 		{
@@ -26,16 +28,18 @@ public class Main extends PApplet {
 			update();
 
 			image(faceDetector.getFrame(), 0, 0);
+
+			if (detectedFace != null)
+				image(detectedFace.toPImage(), 0, 0);
 		}
 
 	public void update()
 		{
-			faceDetector.detectFace();
+			detectedFace = faceDetector.detectFace();
 		}
 
 	public void exitActual()
 		{
-			super.exitActual();
 			faceDetector.releaseCamera();
 		}
 
