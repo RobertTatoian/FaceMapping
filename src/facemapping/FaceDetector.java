@@ -133,6 +133,11 @@ public class FaceDetector {
 		float[] leftEye = null, rightEye = null;
 		for (Rect face : facesArray)
 		{
+			int shift = Math.min(20, face.y);
+			shift = Math.min(shift, frame.height() - (face.y + face.height + shift));
+			face.y -= shift;
+			face.height += shift * 2;
+
 			/*
 			 * Note tl() in the second argument is most likely top left
 			 * and br() in the next argument is most likely bottom right
@@ -146,7 +151,6 @@ public class FaceDetector {
 			MatOfRect facesROI = new MatOfRect(face);
 
 			float[][] eyeCoordinates = searchForEyes(greyROI, face);
-			searchForMouth(greyROI, facesROI, face);
 
 			if (eyeCoordinates.length == 2)
 			{
@@ -177,13 +181,26 @@ public class FaceDetector {
 		{
 			Imgproc.rectangle(frame, profile.tl(), profile.br(), new Scalar(0, 0, 255, 255), 1);
 			Mat greyROI = grayFrame.submat(profile);
-			searchForEyes(greyROI, profile);
+			float[][] eyeCoordinates = searchForEyes(greyROI, profile);
+			if (eyeCoordinates.length == 1 && eyeCoordinates[0][0] < profile.width / 2)
+			{
+				rightEye = eyeCoordinates[0];
+				break;
+			}
+			else
+			{
+				rightEye = null;
+			}
 
 		}
 
 		if (profileArray.length == 0 && faceRect != null)
 		{
-			detectedFace.updateFrontalFace(frame.submat(faceRect), leftEye, rightEye);
+			detectedFace.updateFrontTexture(frame.submat(faceRect), leftEye, rightEye);
+		}
+		else if (profileArray.length == 1 && facesArray.length == 0 && rightEye != null)
+		{
+			detectedFace.updateProfileTexture(frame.submat(profileArray[0]), rightEye);
 		}
 
 		return detectedFace;
@@ -216,7 +233,7 @@ public class FaceDetector {
 							(float) eyeSize.width,
 							(float) eyeSize.height };
 
-			Imgproc.rectangle(frame, e.tl(), e.br(), new Scalar(255, 0, 0, 255), 1);
+		//	Imgproc.rectangle(frame, e.tl(), e.br(), new Scalar(255, 0, 0, 255), 1);
 		}
 		return eyeCoordinates;
 	}
