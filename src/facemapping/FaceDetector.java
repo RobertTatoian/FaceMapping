@@ -88,12 +88,16 @@ public class FaceDetector {
 		// Initialize
 		MatOfRect faces = new MatOfRect();
 		MatOfRect profiles = new MatOfRect();
+		boolean facingRight = true;
 		Mat grayFrame = new Mat();
 
 		// convert the frame in gray scale
 		Imgproc.cvtColor(frame, grayFrame, Imgproc.COLOR_BGR2GRAY);
 		// equalize the frame histogram to improve the result
 		Imgproc.equalizeHist(grayFrame, grayFrame);
+
+		Mat profileFrame = new Mat();
+		grayFrame.copyTo(profileFrame);
 
 		// compute minimum face size (20% of the frame height)
 		if (this.absoluteFaceSize == 0)
@@ -106,32 +110,58 @@ public class FaceDetector {
 		}
 
 		// detect faces
-		try
+		this.faceCascade.detectMultiScale(grayFrame, faces, 1.1, 2,
+																			0 | Objdetect.CASCADE_SCALE_IMAGE,
+																			new Size(this.absoluteFaceSize,
+																							 this.absoluteFaceSize),
+																			new Size());
+		this.profileCascade.detectMultiScale(profileFrame, profiles, 1.1, 2,
+																				 0 | Objdetect.CASCADE_SCALE_IMAGE,
+																				 new Size(this.absoluteFaceSize,
+																									this.absoluteFaceSize),
+																				 new Size());
+
+		Rect[] profileArray = profiles.toArray();
+		if (profileArray.length == 0)
 		{
-			this.faceCascade.detectMultiScale(grayFrame, faces, 1.1, 2,
-																				0 | Objdetect.CASCADE_SCALE_IMAGE,
-																				new Size(this.absoluteFaceSize,
-																								 this.absoluteFaceSize),
-																				new Size());
-			this.profileCascade.detectMultiScale(grayFrame, profiles, 1.1, 2,
+			Core.flip(grayFrame, profileFrame, 1);
+			this.profileCascade.detectMultiScale(profileFrame, profiles, 1.1, 2,
 																					 0 | Objdetect.CASCADE_SCALE_IMAGE,
 																					 new Size(this.absoluteFaceSize,
 																										this.absoluteFaceSize),
 																					 new Size());
+			facingRight = false;
+			profileArray = profiles.toArray();
+
+			for (Rect profile : profileArray)
+			{
+				profile.x = grayFrame.width() - profile.x - profile.width;
+			}
 		}
-		catch (Exception e)
-		{
-			System.err.println("There is a problem with face_cascade detection. Printing stack trace: ");
-			e.printStackTrace();
-		}
+		System.out.println(profiles.cols() + " " + profiles.rows());
 
 		// each rectangle in faces is a face
 		Rect[] facesArray = faces.toArray();
-		Rect[] profileArray = profiles.toArray();
 
 		Rect faceRect = null;
+
+
+		if (profileArray.length == 0 && facesArray.length == 1)
+		{
+			processFrontalFaces(grayFrame, facesArray);
+		}
+		else if (profileArray.length == 1 && facesArray.length == 0)
+		{
+			processProfiles(grayFrame, profileArray, facingRight);
+		}
+
+		return detectedFace;
+	}
+
+	private boolean processFrontalFaces(Mat grayFrame, Rect[] faces)
+	{
 		float[] leftEye = null, rightEye = null;
-		for (Rect face : facesArray)
+		for (Rect face : faces)
 		{
 			int shift = Math.min(20, face.y);
 			shift = Math.min(shift, frame.height() - (face.y + face.height + shift));
@@ -172,38 +202,28 @@ public class FaceDetector {
 					continue;
 				}
 
-				faceRect = face;
-				break;
+				detectedFace.updateFrontTexture(frame.submat(face), leftEye, rightEye);
+				return true;
 			}
 		}
+		return false;
+	}
 
-		for (Rect profile : profileArray)
+	private boolean processProfiles(Mat grayFrame, Rect[] profiles, boolean facingRight)
+	{
+		for (Rect profile : profiles)
 		{
 			Imgproc.rectangle(frame, profile.tl(), profile.br(), new Scalar(0, 0, 255, 255), 1);
 			Mat greyROI = grayFrame.submat(profile);
 			float[][] eyeCoordinates = searchForEyes(greyROI, profile);
 			if (eyeCoordinates.length == 1 && eyeCoordinates[0][0] < profile.width / 2)
 			{
-				rightEye = eyeCoordinates[0];
-				break;
-			}
-			else
-			{
-				rightEye = null;
+				detectedFace.updateProfileTexture(frame.submat(profile), eyeCoordinates[0], facingRight);
+				return true;
 			}
 
 		}
-
-		if (profileArray.length == 0 && faceRect != null)
-		{
-			detectedFace.updateFrontTexture(frame.submat(faceRect), leftEye, rightEye);
-		}
-		else if (profileArray.length == 1 && facesArray.length == 0 && rightEye != null)
-		{
-			detectedFace.updateProfileTexture(frame.submat(profileArray[0]), rightEye);
-		}
-
-		return detectedFace;
+		return false;
 	}
 
 	/**
@@ -233,7 +253,7 @@ public class FaceDetector {
 							(float) eyeSize.width,
 							(float) eyeSize.height };
 
-		//	Imgproc.rectangle(frame, e.tl(), e.br(), new Scalar(255, 0, 0, 255), 1);
+			Imgproc.rectangle(frame, e.tl(), e.br(), new Scalar(255, 0, 0, 255), 1);
 		}
 		return eyeCoordinates;
 	}

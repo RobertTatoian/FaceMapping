@@ -1,9 +1,6 @@
 package facemapping;
 
-import org.opencv.core.Mat;
-import org.opencv.core.Point;
-import org.opencv.core.Scalar;
-import org.opencv.core.Size;
+import org.opencv.core.*;
 import org.opencv.imgproc.Imgproc;
 import processing.core.PConstants;
 import processing.core.PImage;
@@ -86,22 +83,34 @@ public class DetectedFace {
 			Point tl = new Point(newLeftEye[0] + colShift, newLeftEye[1] + rowShift);
 			Point br = new Point(newRightEye[0] + colShift, newRightEye[1] + rowShift);
 	//		Imgproc.rectangle(centeredFace, tl, br, new Scalar(0, 0, 255, 255), 1);
-			PImage front = matToPImage(centeredFace);
-			float scale = (TEXTURE_HEIGHT + 0.0f) / centeredFace.height();
-			front.resize((int)(front.width * scale), (int)(front.height * scale));
 
 			// TODO blend it into the texture
+			Mat flipped = new Mat();
+			Core.flip(centeredFace, flipped, 1);
+			PImage front = matToPImage(centeredFace);
+			PImage flip = matToPImage(flipped);
+			float scale = (TEXTURE_HEIGHT + 0.0f) / centeredFace.height();
+			flip.resize((int)(front.width * scale), (int)(front.height * scale));
+			front.resize((int)(front.width * scale), (int)(front.height * scale));
+
 			overlayFace(frontTexture, front);
+			overlayFace(frontTexture, flip);
 		}
 
-	public void updateProfileTexture(Mat profile, float[] eyeCoordinates)
+	public void updateProfileTexture(Mat profile, float[] eyeCoordinates, boolean facingRight)
 		{
-			// as of now, there is now way to check the rotation of the profile
+		  // as of now, there is now way to check the rotation of the profile
 			double height = profile.size().height;
 
 			Mat centeredFace = Mat.zeros(new Size(height * 5 / 3, height), profile.type());
 			int rowShift = (int)(profile.height() * 2.0 / 5.0 - eyeCoordinates[1]);
 			int colShift = (int)(profile.width() - eyeCoordinates[0]);
+
+			if (!facingRight)
+			{
+				colShift = centeredFace.width() - colShift - profile.width();
+			}
+
 			for (int i = 0; i < profile.rows(); i++)
 			{
 				for (int j = 0; j < profile.cols(); j++)
@@ -113,11 +122,17 @@ public class DetectedFace {
 				}
 			}
 
+			if (!facingRight)
+			{
+				Mat temp = new Mat();
+				Core.flip(centeredFace, temp, 1);
+				centeredFace = temp;
+			}
+
 			PImage front = matToPImage(centeredFace);
 			float scale = (TEXTURE_HEIGHT + 0.0f) / centeredFace.height();
 			front.resize((int)(front.width * scale), (int)(front.height * scale));
 
-			// TODO blend it into the texture
 			overlayFace(profileTexture, front);
 		}
 
@@ -185,70 +200,9 @@ public class DetectedFace {
 		return (0xFF << 24) | (r << 16) | (g << 8) | (b);
 	}
 
-	private PImage getConvolution(PImage img, float[][] kernel)
-	{
-		PImage output = img.copy();
-		int center = kernel.length / 2;
-
-		for (int x = center; x < output.width - center; x++)
-		{
-			for (int y = center; y < output.height - center; y++)
-			{
-				float acc = 0; // accumulator
-				for (int i = 0; i < kernel.length; i++)
-				{
-					for (int j = 0; j < kernel[i].length; j++)
-					{
-						int red = (img.get(x + i - center, y + j - center) & 0xFF);
-						acc += kernel[i][j] * red * .25f;
-						if (acc > 255) {
-							System.out.println(acc + " " + i + " " + j);
-						}
-					}
-				}
-				if (acc > 255) {
-					acc = 255;
-				}
-				int sum = (int)acc;
-				output.set(x, y, (0xFF << 24) | (sum << 16) | (sum << 8) | sum);
-			}
-		}
-		return output;
-	}
-
-	private PImage detectEdges(PImage img)
-	{
-		float[][] kernelX = {{-1, 0, 1}, {-2, 0, 2}, {-1, 0, 1}};
-		float[][] kernelY = {{-1, -2, -1}, {0, 0, 0}, {1, 2, 1}};
-		PImage gx = getConvolution(img, kernelX);
-		PImage gy = getConvolution(img, kernelY);
-
-		PImage output = img.copy();
-		for (int x = 0; x < output.width; x++)
-		{
-			for (int y = 0; y < output.width; y++)
-			{
-				int acc = (int)(Math.sqrt(gx.get(x, y) * gx.get(x, y) + gy.get(x, y) * gy.get(x, y)));
-				if (acc > 255) {
-					acc = 0;
-				}
-				output.set(x, y, (0xFF << 24) | (acc << 16) | (acc << 8) | acc);
-			}
-		}
-		output.updatePixels();
-		return output;
-	}
-
 	public PImage toPImage()
 		{
 			PImage output = new PImage((TEXTURE_HEIGHT * 5) / 3,  TEXTURE_HEIGHT, PImage.ARGB);
-			PImage frontBlur = frontTexture.copy();
-			PImage frontGrad = frontTexture.copy();
-			PImage profileThreshold = profileTexture.copy();
-			frontBlur.filter(PConstants.GRAY);
-			frontBlur.filter(PConstants.BLUR);
-			frontBlur.filter(PConstants.BLUR);
-			profileThreshold.filter(PConstants.THRESHOLD);
 
 			for (int i = 250; i < output.width; i++)
 			{
