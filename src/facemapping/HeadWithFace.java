@@ -1,7 +1,6 @@
 package facemapping;
 
-import Abstract.GraphicObject;
-import Abstract.SimpleGraphicObject;
+import Abstract.GraphicObject3D;
 import processing.core.PApplet;
 import processing.core.PImage;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
@@ -119,7 +118,7 @@ public class HeadWithFace extends SimpleGraphicObject {
 	}
 
 	@Override
-	public GraphicObject getParent() {
+	public GraphicObject3D getParent() {
 		return null;
 	}
 

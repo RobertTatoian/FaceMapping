@@ -1,8 +1,10 @@
 package Abstract;
 
+import processing.core.PMatrix;
+
 /**
- * Specifies the operations of an abstract GraphicObject, which:
- * - optionally has a reference to some other GraphicObject which is called
+ * Specifies the operations of an abstract GraphicObject3D, which:
+ * - optionally has a reference to some other GraphicObject3D which is called
  *   the parent here.
  * - has a rotation and translation relative to the parent if it is not
  *   null, or relative to the world coordinates otherwise
@@ -10,7 +12,7 @@ package Abstract;
  * - can be updated
  * - can determine if it contains some point given in world coordinates
  */
-public abstract class GraphicObject {
+public abstract class GraphicObject3D {
 
     /**
      * Determines if the given point (in world-coordinates) is inside this.
@@ -22,33 +24,35 @@ public abstract class GraphicObject {
      *
      * @param x The x coordinate of the point (in world coordinates)
      * @param y The y coordinate of the point (in world coordinates)
-     * @return true if this GraphicObject contains the point, false otherwise
+     * @return true if this GraphicObject3D contains the point, false otherwise
      */
-    public abstract boolean isInside(float x, float y);
+    public abstract boolean isInside(float x, float y, float z);
 
     /**
-     * Draws this GraphicObject
+     * Draws this GraphicObject3D
      */
     public abstract void draw();
 
     /**
-     * Updates the internal state of this GraphicObject
+     * Updates the internal state of this GraphicObject3D
      */
     public abstract void update();
 
     /**
      * Returns the current parent
-     * @return A reference to the parent, a GraphicObject, if it exists,
+     * @return A reference to the parent, a GraphicObject3D, if it exists,
      *         null otherwise.
      */
-    public abstract GraphicObject getParent();
+    public abstract GraphicObject3D getParent();
 
     /**
      * Returns the current rotation (relative to the reference frame of the
      * parent).
      * @return The angle of ration in radians
      */
-    public abstract float getRotation();
+    public abstract float getRotationX();
+    public abstract float getRotationY();
+    public abstract float getRotationZ();
 
     /**
      * Returns the translation along the x-axis.
@@ -56,7 +60,7 @@ public abstract class GraphicObject {
      *         reference frame if the parent exists or in the world's
      *         coordinates otherwise.
      */
-    public abstract float getTranslateX();
+    public abstract float getTranslationX();
 
     /**
      * Returns the translation along the y-axis.
@@ -64,6 +68,9 @@ public abstract class GraphicObject {
      *         reference frame if the parent exists or in the world's
      *         coordinates otherwise.
      */
-    public abstract float getTranslateY();
+    public abstract float getTranslationY();
+    public abstract float getTranslationZ();
+
+    public abstract PMatrix getTransformationMatrix();
 
 }

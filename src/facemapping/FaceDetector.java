@@ -1,6 +1,7 @@
 package facemapping;
 
 import org.opencv.core.*;
+import org.opencv.core.Point;
 import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.objdetect.CascadeClassifier;
@@ -74,7 +75,7 @@ public class FaceDetector {
 	public DetectedFace detectFace()
 		{
 			camera.read(frame);
-			return detectFace(frame);
+			return detectFace(frame, 0);
 		}
 
 	/*
@@ -83,7 +84,7 @@ public class FaceDetector {
 	 * http://opencv-java-tutorials.readthedocs.org/en/latest/08%20-%20Face%
 	 * 20Recognition%20and%20Tracking.html
 	 */
-	private DetectedFace detectFace(Mat frame)
+	private DetectedFace detectFace(Mat frame, float angle)
 	{
 		// Initialize
 		MatOfRect faces = new MatOfRect();
@@ -143,42 +144,46 @@ public class FaceDetector {
 		// each rectangle in faces is a face
 		Rect[] facesArray = faces.toArray();
 
-		Rect faceRect = null;
-
+	/*	if (profileArray.length == 0 && facesArray.length == 0 && angle < 350)
+		{
+			Mat rotatedFrame = new Mat();
+			angle += 30;
+			Point center = new Point(frame.width() / 2, frame.height() / 2);
+			Mat rotMatrix = Imgproc.getRotationMatrix2D(center, angle, 1);
+			Imgproc.warpAffine(frame, rotatedFrame, rotMatrix, frame.size());
+			return detectFace(rotatedFrame, angle);
+		}*/
 
 		if (profileArray.length == 0 && facesArray.length == 1)
 		{
-			processFrontalFaces(grayFrame, facesArray);
+			processFrontalFaces(grayFrame, frame, facesArray);
 		}
 		else if (profileArray.length == 1 && facesArray.length == 0)
 		{
-			processProfiles(grayFrame, profileArray, facingRight);
+			processProfiles(grayFrame, frame, profileArray, facingRight);
 		}
 
 		return detectedFace;
 	}
 
-	private boolean processFrontalFaces(Mat grayFrame, Rect[] faces)
+	private boolean processFrontalFaces(Mat grayFrame, Mat originalFrame, Rect[] faces)
 	{
 		float[] leftEye = null, rightEye = null;
 		for (Rect face : faces)
 		{
-			int shift = Math.min(20, face.y);
-			shift = Math.min(shift, frame.height() - (face.y + face.height + shift));
+			int shift = Math.min(30, face.y);
+			shift = Math.min(shift, frame.height() - (face.y + face.height + shift - 10));
 			face.y -= shift;
-			face.height += shift * 2;
+			face.height += shift * 2 - 10;
 
 			/*
 			 * Note tl() in the second argument is most likely top left
 			 * and br() in the next argument is most likely bottom right
 			 */
-			Imgproc.rectangle(frame, face.tl(), face.br(), new Scalar(0, 255, 0, 255), 1);
+			Imgproc.rectangle(originalFrame, face.tl(), face.br(), new Scalar(0, 255, 0, 255), 1);
 
 			// The face area that was detected in greyscale
 			Mat greyROI = grayFrame.submat(face);
-
-			// The rectangular bounds on the face area
-			MatOfRect facesROI = new MatOfRect(face);
 
 			float[][] eyeCoordinates = searchForEyes(greyROI, face);
 
@@ -202,23 +207,23 @@ public class FaceDetector {
 					continue;
 				}
 
-				detectedFace.updateFrontTexture(frame.submat(face), leftEye, rightEye);
+				detectedFace.updateFrontTexture(originalFrame.submat(face), leftEye, rightEye);
 				return true;
 			}
 		}
 		return false;
 	}
 
-	private boolean processProfiles(Mat grayFrame, Rect[] profiles, boolean facingRight)
+	private boolean processProfiles(Mat grayFrame, Mat originalFrame, Rect[] profiles, boolean facingRight)
 	{
 		for (Rect profile : profiles)
 		{
-			Imgproc.rectangle(frame, profile.tl(), profile.br(), new Scalar(0, 0, 255, 255), 1);
+			Imgproc.rectangle(originalFrame, profile.tl(), profile.br(), new Scalar(0, 0, 255, 255), 1);
 			Mat greyROI = grayFrame.submat(profile);
 			float[][] eyeCoordinates = searchForEyes(greyROI, profile);
 			if (eyeCoordinates.length == 1 && eyeCoordinates[0][0] < profile.width / 2)
 			{
-				detectedFace.updateProfileTexture(frame.submat(profile), eyeCoordinates[0], facingRight);
+				detectedFace.updateProfileTexture(originalFrame.submat(profile), eyeCoordinates[0], facingRight);
 				return true;
 			}
 

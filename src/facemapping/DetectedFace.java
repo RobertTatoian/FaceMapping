@@ -44,7 +44,7 @@ public class DetectedFace {
 
 			Mat rotMatrix = Imgproc.getRotationMatrix2D(center, angle, 1);
 			Mat rotatedFace = new Mat();
-			Imgproc.warpAffine(face, rotatedFace, rotMatrix, new Size(face.width(), face.height()));
+			Imgproc.warpAffine(face, rotatedFace, rotMatrix, face.size());
 
 			// Translate and scale the image using the position of the eyes
 			// convert angle to radians
@@ -200,6 +200,9 @@ public class DetectedFace {
 		return (0xFF << 24) | (r << 16) | (g << 8) | (b);
 	}
 
+	/**
+	 * Returns a PImage of the detected
+	 */
 	public PImage toPImage()
 		{
 			PImage output = new PImage((TEXTURE_HEIGHT * 5) / 3,  TEXTURE_HEIGHT, PImage.ARGB);
@@ -214,6 +217,16 @@ public class DetectedFace {
 						weight = (350f - i) / 50f;
 					}
 					output.set(i, j, blendPixels(profileTexture.get(i, j), frontTexture.get(i, j), weight));
+					int r = (output.get(i, j) & 0xFF0000) >> 16;
+					int g = (output.get(i, j) & 0x00FF00) >> 8;
+					int b = (output.get(i, j) & 0x0000FF);
+					if (r < 30 && g < 30 && b < 30)
+					{
+					//	output.set(i, j, (r + g + b) / 3);
+						output.set(i, j, 0xFFF0000);
+						//output.set(i, j, output.get(250, 100));
+					}
+
 					output.set(output.width - i, j, output.get(i, j));
 				}
 			}
