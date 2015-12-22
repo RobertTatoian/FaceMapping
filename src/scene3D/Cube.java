@@ -1,7 +1,6 @@
 
 package scene3D;
 
-
 import processing.core.PApplet;
 import processing.core.PConstants;
 import processing.core.PImage;
@@ -15,13 +14,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 
-/**
- * Created by wpgodone on 12/21/2015.
- */
 public class Cube extends SimpleGraphicObject3D {
 	
-	private GraphicObject3D	parent;
-							
 	private PApplet			applet;
 							
 	private BoundingBox3D	relativeBoundingBox;
@@ -341,7 +335,7 @@ public class Cube extends SimpleGraphicObject3D {
 	@Override
 	public GraphicObject3D getParent( )
 		{
-			return parent;
+			return null;
 		}
 		
 		
