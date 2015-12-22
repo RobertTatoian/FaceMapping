@@ -17,6 +17,9 @@ public class Main extends PApplet {
 	public void settings()
 		{
 			size(640, 480, P3D);
+			surface.setResizable(false);
+
+			camera(640f, 480f, -600f, width / 2, height / 2, 0, 0, 1, 0);
 		}
 
 	public void setup()
