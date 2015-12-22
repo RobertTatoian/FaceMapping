@@ -3,6 +3,7 @@ package scene3D;
 
 
 import processing.core.PApplet;
+import processing.core.PImage;
 import processing.core.PVector;
 import scene3Dabstract.BoundingBox3D;
 import scene3Dabstract.GraphicObject3D;
@@ -28,8 +29,9 @@ public class Cube extends SimpleGraphicObject3D {
 	private float			size;
 							
 	private boolean			fill	= true;
-									
-									
+
+	private PImage frontTexture, leftTexture, rightTexture;
+
 	public Cube(float x, float y, float z, float size, PApplet applet)
 		{
 			this(x, y, z, size, 0, 0, 0, applet, null);
@@ -80,7 +82,7 @@ public class Cube extends SimpleGraphicObject3D {
 	public void draw( )
 		{
 			applet.pushMatrix();
-			// applet.scale(100f, 100f, 100f);
+			applet.textureMode(applet.NORMAL);
 			
 			applet.translate(translateX, translateY, translateZ);
 			applet.rotateX(rotationX);
@@ -89,32 +91,34 @@ public class Cube extends SimpleGraphicObject3D {
 			
 			applet.stroke(1, 1, 1);
 			applet.strokeWeight(1f);
-			// applet.rect(0, 0, 10, 10);
-			
-			applet.beginShape(PApplet.QUADS);
-			// TODO texture mapping
-			
-			// I think I have the coordinates mixed up
-			
+
 			// BEGIN CUBE
 			if (fill) {
 				applet.fill(0, 100, 100);
 			} else {
 				applet.noFill();
 			}
-			
+
+			applet.beginShape(PApplet.QUADS);
+
+			if (frontTexture != null)
+					applet.texture(frontTexture);
+
 			// Front side
-			applet.vertex(size / 2, size / 2, size / 2);
-			applet.vertex(-size / 2, size / 2, size / 2);
-			applet.vertex(-size / 2, -size / 2, size / 2);
-			applet.vertex(size / 2, -size / 2, size / 2);
+			applet.vertex(size / 2, size / 2, size / 2, 1, 1);
+			applet.vertex(-size / 2, size / 2, size / 2, 0, 1);
+			applet.vertex(-size / 2, -size / 2, size / 2, 0, 0);
+			applet.vertex(size / 2, -size / 2, size / 2, 1, 0);
+
+			applet.endShape();
+			applet.beginShape(PApplet.QUADS);
 			
 			// Top side
 			applet.vertex(size / 2, size / 2, -size / 2);
 			applet.vertex(-size / 2, size / 2, -size / 2);
 			applet.vertex(-size / 2, size / 2, size / 2);
 			applet.vertex(size / 2, size / 2, size / 2);
-			
+
 			// Bottom side
 			applet.vertex(size / 2, -size / 2, size / 2);
 			applet.vertex(-size / 2, -size / 2, size / 2);
@@ -126,18 +130,30 @@ public class Cube extends SimpleGraphicObject3D {
 			applet.vertex(-size / 2, -size / 2, -size / 2);
 			applet.vertex(-size / 2, size / 2, -size / 2);
 			applet.vertex(size / 2, size / 2, -size / 2);
+
+			applet.endShape();
+			applet.beginShape(PApplet.QUADS);
+
+			if (leftTexture != null)
+				applet.texture(leftTexture);
 			
 			// Left side
-			applet.vertex(-size / 2, size / 2, size / 2);
-			applet.vertex(-size / 2, size / 2, -size / 2);
-			applet.vertex(-size / 2, -size / 2, -size / 2);
-			applet.vertex(-size / 2, -size / 2, size / 2);
+			applet.vertex(-size / 2, size / 2, size / 2, 1, 0);
+			applet.vertex(-size / 2, size / 2, -size / 2, 0, 0);
+			applet.vertex(-size / 2, -size / 2, -size / 2, 0, 1);
+			applet.vertex(-size / 2, -size / 2, size / 2, 1, 1);
+
+			applet.endShape();
+			applet.beginShape(PApplet.QUADS);
+
+			if (rightTexture != null)
+				applet.texture(rightTexture);
 			
 			// Right side
-			applet.vertex(size / 2, size / 2, -size / 2);
-			applet.vertex(size / 2, size / 2, size / 2);
-			applet.vertex(size / 2, -size / 2, size / 2);
-			applet.vertex(size / 2, -size / 2, -size / 2);
+			applet.vertex(size / 2, size / 2, -size / 2, 1, 1);
+			applet.vertex(size / 2, size / 2, size / 2, 0, 1);
+			applet.vertex(size / 2, -size / 2, size / 2, 0, 1);
+			applet.vertex(size / 2, -size / 2, -size / 2, 1, 0);
 			
 			applet.endShape();
 			applet.popMatrix();
@@ -266,10 +282,21 @@ public class Cube extends SimpleGraphicObject3D {
 			this.rotationZ = angle;
 		}
 
-
-	
-	void setFill(boolean in_fill)
+	public void setFill(boolean fill)
 		{
-			fill = in_fill;
+			this.fill = fill;
 		}
+
+	public void setFrontTexture(PImage frontTexture) {
+		this.frontTexture = frontTexture;
+	}
+
+	public void setLeftTexture(PImage leftTexture) {
+		this.leftTexture = leftTexture;
+	}
+
+	public void setRightTexture(PImage rightTexture) {
+		this.rightTexture = rightTexture;
+	}
+
 }

@@ -9,6 +9,9 @@ import processing.core.PImage;
 import scene3D.Cube;
 import scene3D.World;
 
+import java.util.ArrayList;
+import java.util.List;
+
 
 /**
  * Displays and manages 3 frames: 1. The face texture 2. The webcam input (with
@@ -47,8 +50,6 @@ public class Main extends PApplet {
 			
 			worldX = width / 2;
 			worldY = height / 2;
-			
-			
 		}
 		
 		
@@ -66,27 +67,21 @@ public class Main extends PApplet {
 			update();
 			
 			PImage frame = faceDetector.getFrame();
+			List<PImage> textures = splitFaceTexture(detectedFace);
 			
 			if (debug)
 				{
-					
 					image(frame, -worldX, -worldY);
-					
 				}
 				
-			if (detectedFace != null)
+			if (detectedFace != null && debug)
 				{
 					PImage texture = detectedFace.toPImage();
 					
-					if (debug)
-						{
-							
-							image(texture, -worldX, -worldY, (200.0f / texture.height) * texture.width, 200);
-							
-						}
+					//image(texture, -worldX, -worldY, (200.0f / texture.height) * texture.width, 200);
+					image(textures.get(0), -worldX, -worldY, 200, 200);
 				}
-			// cube.draw();
-			
+
 			scene.draw();
 			
 			popMatrix();
@@ -100,11 +95,52 @@ public class Main extends PApplet {
 				{
 					detectedFace = face;
 				}
-			//
-			// cubeAngle += 360 * 2;
-			//
-			// cube = new Cube(width * 0.75f, width / 4, 200, 20,
-			// cubeAngle, 0, 0, this, null);
+
+			List<PImage> textures = splitFaceTexture(face);
+			for (Cube c : scene.getCollection())
+			{
+				c.setLeftTexture(textures.get(0));
+				c.setFrontTexture(textures.get(1));
+				c.setRightTexture(textures.get(2));
+			}
+		}
+
+	// TODO what class should contain this method?
+
+	/**
+	 * Takes the output of a face texture and splits it into three textures for
+	 * each side of a cube accounting for the position of the origin in image
+	 * coordinates.
+	 *
+	 * @param face
+	 * @return
+	 */
+	private List<PImage> splitFaceTexture(DetectedFace face)
+		{
+			List<PImage> textures = new ArrayList<PImage>(3);
+			PImage faceTexture = face.toPImage();
+			PImage left = new PImage(300, 300);
+			PImage front = new PImage(300, 300);
+			PImage right = new PImage(300, 300);
+
+			for (int i = 0; i < 300; i++)
+				{
+					for (int j = 0; j < 300; j++)
+						{
+							front.set(i, j, faceTexture.get(i + 100, 300 - j));
+
+							if (i < 100)
+								{
+									left.set(i + 200, 300 - j, faceTexture.get(i, j));
+									right.set(i, 300 - j, faceTexture.get(i + 400, j));
+								}
+						}
+				}
+			textures.add(left);
+			textures.add(front);
+			textures.add(right);
+
+			return textures;
 		}
 		
 		
