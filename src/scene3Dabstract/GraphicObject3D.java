@@ -101,20 +101,35 @@ public abstract class GraphicObject3D {
 			return g.getMatrix();
 		}
 
-	public PVector worldToRelativeCoordinates(float x, float y, float z)
+	public PVector parentToRelativeCoordinates(float x, float y, float z)
 		{
-			return worldToRelativeCoordinates(new PVector(x, y, z));
+			return parentToRelativeCoordinates(new PVector(x, y, z));
 		}
 
-	public PVector worldToRelativeCoordinates(PVector pos)
+	public PVector parentToRelativeCoordinates(PVector pos)
 		{
 			if (getParent() != null)
 				{
-					pos = worldToRelativeCoordinates(pos);
+					pos = parentToRelativeCoordinates(pos);
 				}
 
 			PMatrix transMatrix = getTransformationMatrix();
-			transMatrix.invert();
 			return transMatrix.mult(pos, null);
 		}
+
+	public PVector relativeToParentCoordinates(float x, float y, float z)
+	{
+		return parentToRelativeCoordinates(new PVector(x, y, z));
+	}
+
+	public PVector relativeToParentCoordinates(PVector pos)
+	{
+		if (getParent() != null)
+		{
+			pos = parentToRelativeCoordinates(pos);
+		}
+
+		PMatrix transMatrix = getTransformationMatrix();
+		return transMatrix.mult(pos, null);
+	}
 }

@@ -30,8 +30,7 @@ public class Main extends PApplet {
 	private boolean			debug		= false;
 										
 	private float			rotation	= 0;
-										
-										
+
 	public void settings( )
 		{
 			size(1024, 768, P3D);
@@ -51,7 +50,7 @@ public class Main extends PApplet {
 			worldX = width / 2;
 			worldY = height / 2;
 		}
-		
+
 		
 	public void draw( )
 		{
@@ -60,15 +59,14 @@ public class Main extends PApplet {
 			pushMatrix();
 			
 			translate(worldX, worldY);
-			
+
 			//TODO Make the camera rotate around the entire cube.
 			camera(cos(rotation) * 360, 0, 600f, 0, 0, 0, 0, 1, 0);
 			
 			update();
 			
 			PImage frame = faceDetector.getFrame();
-			List<PImage> textures = splitFaceTexture(detectedFace);
-			
+
 			if (debug)
 				{
 					image(frame, -worldX, -worldY);
@@ -78,12 +76,11 @@ public class Main extends PApplet {
 				{
 					PImage texture = detectedFace.toPImage();
 					
-					//image(texture, -worldX, -worldY, (200.0f / texture.height) * texture.width, 200);
-					image(textures.get(0), -worldX, -worldY, 200, 200);
+					image(texture, -worldX, -worldY, (200.0f / texture.height) * texture.width, 200);
 				}
 
 			scene.draw();
-			
+
 			popMatrix();
 		}
 		

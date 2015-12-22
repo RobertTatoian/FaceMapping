@@ -62,17 +62,21 @@ public class Cube extends SimpleGraphicObject3D {
 	public boolean isInside(float x, float y, float z)
 		{
 			// Transform the coordinates to relative coordinates
-			PVector pos = worldToRelativeCoordinates(x, y, z);
+			PVector pos = parentToRelativeCoordinates(x, y, z);
 			return relativeBoundingBox.isInside(pos.x, pos.y, pos.z);
 		}
 		
 		
 	public boolean intersects(Cube cube)
 		{
-			List <PVector> vertices = cube.getVertices();
+			List <PVector> vertices = getVertices();
 			for (PVector vertex : vertices)
 				{
-					if (isInside(vertex.x, vertex.y, vertex.z)) { return true; }
+					PVector pos = relativeToParentCoordinates(vertex);
+					if (cube.isInside(pos.x, pos.y, pos.z))
+						{
+							return true;
+						}
 				}
 			return false;
 		}
