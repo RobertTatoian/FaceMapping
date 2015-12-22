@@ -14,9 +14,14 @@ import java.util.List;
 
 
 /**
- * Displays and manages 3 frames: 1. The face texture 2. The webcam input (with
- * rectangles showing detected features) 3. A 3d shape with the face texture
- * mapped onto it
+ * Displays and manages 3 frames:
+ * 1. The face texture
+ * 2. The webcam input (with rectangles showing detected features)
+ * 3. A 3d shape with the face texture mapped onto it
+ * 
+ * @author Robert Tatoian
+ * @author Warren Godone-Maresca
+ * @version 1.0
  */
 public class Main extends PApplet {
 	
