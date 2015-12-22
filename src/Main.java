@@ -2,8 +2,6 @@ import facemapping.DetectedFace;
 import facemapping.FaceDetector;
 import org.opencv.core.Core;
 
-import com.jogamp.newt.event.KeyEvent;
-
 import processing.core.PApplet;
 import processing.core.PImage;
 import scene3D.Cube;
@@ -14,10 +12,9 @@ import java.util.List;
 
 
 /**
- * Displays and manages 3 frames:
- * 1. The face texture
- * 2. The webcam input (with rectangles showing detected features)
- * 3. A 3d shape with the face texture mapped onto it
+ * Displays and manages 3 frames: 1. The face texture 2. The webcam input (with
+ * rectangles showing detected features) 3. A 3d shape with the face texture
+ * mapped onto it
  * 
  * @author Robert Tatoian
  * @author Warren Godone-Maresca
@@ -29,15 +26,16 @@ public class Main extends PApplet {
 							
 	private FaceDetector	faceDetector;
 	private DetectedFace	detectedFace;
-
+							
 	private World			scene;
 							
 	private boolean			debug		= false;
 										
 	private float			rotation	= 0;
-
-	private Cube testCube1, testCube2;
-
+										
+	private Cube			testCube1, testCube2;
+							
+							
 	public void settings( )
 		{
 			size(1024, 768, P3D);
@@ -56,11 +54,11 @@ public class Main extends PApplet {
 			
 			worldX = width / 2;
 			worldY = height / 2;
-
+			
 			testCube1 = new Cube(0, 0, 0, 10, this);
 			testCube2 = new Cube(5, 5, 5, 10, this);
 		}
-
+		
 		
 	public void draw( )
 		{
@@ -69,17 +67,17 @@ public class Main extends PApplet {
 			pushMatrix();
 			
 			translate(worldX, worldY);
-
+			
 			testCube1.draw();
 			testCube2.draw();
-
-			//TODO Make the camera rotate around the entire cube.
+			
+			// TODO Make the camera rotate around the entire cube.
 			camera(cos(rotation) * 360, 0, 600f, 0, 0, 0, 0, 1, 0);
 			
 			update();
 			
 			PImage frame = faceDetector.getFrame();
-
+			
 			if (debug)
 				{
 					image(frame, -worldX, -worldY);
@@ -91,12 +89,12 @@ public class Main extends PApplet {
 					
 					image(texture, -worldX, -worldY, (200.0f / texture.height) * texture.width, 200);
 				}
-
+				
 			scene.draw();
-
+			
 			System.out.println(testCube1.intersectsSAT(testCube2));
 			System.out.println(testCube2.intersectsSAT(testCube1));
-
+			
 			popMatrix();
 		}
 		
@@ -108,18 +106,19 @@ public class Main extends PApplet {
 				{
 					detectedFace = face;
 				}
-
-			List<PImage> textures = splitFaceTexture(face);
+				
+			List <PImage> textures = splitFaceTexture(face);
 			for (Cube c : scene.getCollection())
-			{
-				c.setLeftTexture(textures.get(0));
-				c.setFrontTexture(textures.get(1));
-				c.setRightTexture(textures.get(2));
-			}
+				{
+					c.setLeftTexture(textures.get(0));
+					c.setFrontTexture(textures.get(1));
+					c.setRightTexture(textures.get(2));
+				}
 		}
-
+		
+		
 	// TODO what class should contain this method?
-
+	
 	/**
 	 * Takes the output of a face texture and splits it into three textures for
 	 * each side of a cube accounting for the position of the origin in image
@@ -128,20 +127,20 @@ public class Main extends PApplet {
 	 * @param face
 	 * @return
 	 */
-	private List<PImage> splitFaceTexture(DetectedFace face)
+	private List <PImage> splitFaceTexture(DetectedFace face)
 		{
-			List<PImage> textures = new ArrayList<PImage>(3);
+			List <PImage> textures = new ArrayList <PImage>(3);
 			PImage faceTexture = face.toPImage();
 			PImage left = new PImage(300, 300);
 			PImage front = new PImage(300, 300);
 			PImage right = new PImage(300, 300);
-
+			
 			for (int i = 0; i < 300; i++)
 				{
 					for (int j = 0; j < 300; j++)
 						{
 							front.set(i, j, faceTexture.get(i + 100, 300 - j));
-
+							
 							if (i < 100)
 								{
 									left.set(i + 200, 300 - j, faceTexture.get(i, j));
@@ -152,7 +151,7 @@ public class Main extends PApplet {
 			textures.add(left);
 			textures.add(front);
 			textures.add(right);
-
+			
 			return textures;
 		}
 		
