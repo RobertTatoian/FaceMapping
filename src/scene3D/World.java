@@ -47,7 +47,7 @@ public class World extends ComplexGraphicObject3D<Cube> {
 					float zRot = theApp.random(2.0f, 10.0f);
 					// TODO Perhaps get rid of the reference to a parent? What
 					// are your thoughts?
-					Cube interiorCube = new Cube(xPos, yPos, zPos, size, xRot, yRot, zRot, theApp, null);
+					Cube interiorCube = new Cube(xPos, yPos, zPos, size, xRot, yRot, zRot, theApp);
 					cubesInWorld.add(interiorCube);
 				}
 		}

@@ -31,6 +31,8 @@ public class Main extends PApplet {
 										
 	private float			rotation	= 0;
 
+	private Cube testCube1, testCube2;
+
 	public void settings( )
 		{
 			size(1024, 768, P3D);
@@ -49,6 +51,9 @@ public class Main extends PApplet {
 			
 			worldX = width / 2;
 			worldY = height / 2;
+
+			testCube1 = new Cube(0, 0, 0, 10, this);
+			testCube2 = new Cube(5, 5, 5, 10, this);
 		}
 
 		
@@ -59,6 +64,9 @@ public class Main extends PApplet {
 			pushMatrix();
 			
 			translate(worldX, worldY);
+
+			testCube1.draw();
+			testCube2.draw();
 
 			//TODO Make the camera rotate around the entire cube.
 			camera(cos(rotation) * 360, 0, 600f, 0, 0, 0, 0, 1, 0);
@@ -80,6 +88,9 @@ public class Main extends PApplet {
 				}
 
 			scene.draw();
+
+			System.out.println(testCube1.intersectsSAT(testCube2));
+			System.out.println(testCube2.intersectsSAT(testCube1));
 
 			popMatrix();
 		}
