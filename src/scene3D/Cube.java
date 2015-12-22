@@ -51,16 +51,6 @@ public class Cube extends SimpleGraphicObject3D {
 	public Cube(float x, float y, float z, float size, PApplet applet)
 		{
 			this(x, y, z, size, 0, 0, 0, applet);
-			
-			float translationalLimit = 5f;
-			xTranslationalVelocity = this.applet.random(-translationalLimit, translationalLimit);
-			yTranslationalVelocity = this.applet.random(-translationalLimit, translationalLimit);
-			zTranslationalVelocity = this.applet.random(-translationalLimit, translationalLimit);
-			
-			float rotationalLimit = 0.1f;
-			xRotationalVelocity = this.applet.random(-rotationalLimit, rotationalLimit);
-			yRotationalVelocity = this.applet.random(-rotationalLimit, rotationalLimit);
-			zRotationalVelocity = this.applet.random(-rotationalLimit, rotationalLimit);
 		}
 		
 		
@@ -117,57 +107,60 @@ public class Cube extends SimpleGraphicObject3D {
 	public boolean intersectsSAT(Cube cube)
 		{
 			List <PVector> myVertices = getVertices();
-			List <PVector> cubeVertices = getVertices();
-			
+			List <PVector> cubeVertices = cube.getVertices();
 			List <PVector> normalVecs = getNormalVectors();
 			
 			for (PVector normal : normalVecs)
 				{
-					if (intersectsAlongAxis(myVertices, cubeVertices, normal)) return true;
+					if (disjointAlongAxis(myVertices, cubeVertices, normal))
+						return false;
 				}
 				
 			List <PVector> cubeNormals = cube.getNormalVectors();
 			
 			for (PVector normal : cubeNormals)
 				{
-					if (intersectsAlongAxis(myVertices, cubeVertices, normal)) return true;
+					if (disjointAlongAxis(myVertices, cubeVertices, normal))
+						return false;
 				}
 				
 			for (PVector myNormal : normalVecs)
 				for (PVector cubeNormal : cubeNormals)
 					{
-						if (intersectsAlongAxis(myVertices, cubeVertices, myNormal.cross(cubeNormal))) return true;
+						if (disjointAlongAxis(myVertices, cubeVertices, myNormal.cross(
+										cubeNormal)))
+							return false;
 					}
 					
-			return false;
+			return true;
 		}
 		
 		
-	private boolean intersectsAlongAxis(List <PVector> myVertices, List <PVector> otherVertices, PVector axis)
+	private boolean disjointAlongAxis(List<PVector> myVertices,
+																		List<PVector> otherVertices, PVector axis)
 		{
 			float myMax = Float.NEGATIVE_INFINITY, myMin = Float.POSITIVE_INFINITY;
 			float cubeMax = Float.NEGATIVE_INFINITY, cubeMin = Float.POSITIVE_INFINITY;
 			
 			// Find the max and min coordinate of each cube along the axis by
-			// projecting
-			// each corner onto the axis
+			// projecting each corner onto the axis
 			for (PVector corner : myVertices)
 				{
-					float dist = corner.dot(axis);
+					float dist = corner.dot(axis) / axis.mag();
 					myMax = Math.max(myMax, dist);
 					myMin = Math.min(myMin, dist);
 				}
 				
 			for (PVector corner : otherVertices)
 				{
-					float dist = corner.dot(axis);
+					float dist = corner.dot(axis) / axis.mag();
 					cubeMax = Math.max(cubeMax, dist);
 					cubeMin = Math.min(cubeMin, dist);
 				}
-				
+
 			float totalLength = (myMax - myMin) + (cubeMax - cubeMin);
 			float totalSpan = Math.max(myMax, cubeMax) - Math.min(myMin, cubeMin);
-			return totalSpan <= totalLength;
+			return totalSpan >= totalLength;
 		}
 		
 		
@@ -196,7 +189,7 @@ public class Cube extends SimpleGraphicObject3D {
 				}
 				
 			applet.beginShape(PApplet.QUADS);
-			
+
 			if (frontTexture != null) applet.texture(frontTexture);
 			
 			// Front side

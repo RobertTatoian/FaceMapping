@@ -143,16 +143,6 @@ public class FaceDetector {
 		// each rectangle in faces is a face
 		Rect[] facesArray = faces.toArray();
 
-	/*	if (profileArray.length == 0 && facesArray.length == 0 && angle < 350)
-		{
-			Mat rotatedFrame = new Mat();
-			angle += 30;
-			Point center = new Point(frame.width() / 2, frame.height() / 2);
-			Mat rotMatrix = Imgproc.getRotationMatrix2D(center, angle, 1);
-			Imgproc.warpAffine(frame, rotatedFrame, rotMatrix, frame.size());
-			return detectFace(rotatedFrame, angle);
-		}*/
-
 		if (profileArray.length == 0 && facesArray.length == 1)
 		{
 			processFrontalFaces(grayFrame, frame, facesArray);

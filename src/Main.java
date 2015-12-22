@@ -92,9 +92,6 @@ public class Main extends PApplet {
 				
 			scene.draw();
 			
-			System.out.println(testCube1.intersectsSAT(testCube2));
-			System.out.println(testCube2.intersectsSAT(testCube1));
-			
 			popMatrix();
 		}
 		
