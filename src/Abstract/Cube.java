@@ -1,7 +1,6 @@
 package Abstract;
 
 import processing.core.PApplet;
-import processing.core.PMatrix;
 import processing.core.PVector;
 
 import java.util.LinkedList;
@@ -14,7 +13,6 @@ public class Cube extends SimpleGraphicObject3D {
 
 	private GraphicObject3D parent;
 
-	private PMatrix transformationMatrix;
 	private PApplet applet;
 
 	private BoundingBox3D relativeBoundingBox;
@@ -73,9 +71,8 @@ public class Cube extends SimpleGraphicObject3D {
 		applet.pushMatrix();
 		//applet.scale(100f, 100f, 100f);
 
-		applet.translate(translateX, translateY, translateZ);
 		applet.rotate(180f / applet.TWO_PI, rotationX, rotationY, rotationZ);
-		this.transformationMatrix = applet.getMatrix().get();
+		applet.translate(translateX, translateY, translateZ);
 
 		applet.stroke(1f);
 		applet.strokeWeight(.01f);
@@ -85,60 +82,45 @@ public class Cube extends SimpleGraphicObject3D {
 		// TODO texture mapping
 
 		// I think I have the coordinates mixed up
-
-		// Floor
-		applet.fill(100, 200, 0);
-		applet.vertex( 10f, 10f, 10f);
-		applet.vertex(-10f, 10f, 10f);
-		applet.vertex(-10f, 10f, -10f);
-		applet.vertex( 10f, 10f, -10f);
-
+		
 		// BEGIN CUBE
 		applet.fill(0, 100, 100);
 
+		// Front side
+		applet.vertex( size / 2,  size / 2, size / 2);
+		applet.vertex(-size / 2,  size / 2, size / 2);
+		applet.vertex(-size / 2, -size / 2, size / 2);
+		applet.vertex( size / 2, -size / 2, size / 2);
+
 		// Top side
-		applet.vertex( 1f, 1f, -1f);
-		applet.vertex(-1f, 1f, -1f);
-		applet.vertex(-1f, 1f,  1f);
-		applet.vertex( 1f, 1f,  1f);
+		applet.vertex( size / 2, size / 2, -size / 2);
+		applet.vertex(-size / 2, size / 2, -size / 2);
+		applet.vertex(-size / 2, size / 2,  size / 2);
+		applet.vertex( size / 2, size / 2,  size / 2);
 
 		// Bottom side
-		applet.vertex( 1f, -1f,  1f);
-		applet.vertex(-1f, -1f,  1f);
-		applet.vertex(-1f, -1f, -1f);
-		applet.vertex( 1f, -1f, -1f);
-
-		applet.endShape();
-		applet.beginShape(PApplet.QUADS);
-
-		// Front side
-		applet.vertex( 1f,  1f, 1f, 1, 1);
-		applet.vertex(-1f,  1f, 1f, 0, 1);
-		applet.vertex(-1f, -1f, 1f, 0, 0);
-		applet.vertex( 1f, -1f, 1f, 1, 0);
-
-		applet.endShape();
-		applet.beginShape(PApplet.QUADS);
-
-		applet.fill(0, 100, 100);
+		applet.vertex( size / 2, -size / 2,  size / 2);
+		applet.vertex(-size / 2, -size / 2,  size / 2);
+		applet.vertex(-size / 2, -size / 2, -size / 2);
+		applet.vertex( size / 2, -size / 2, -size / 2);
 
 		// Back side
-		applet.vertex( 1f, -1f, -1f);
-		applet.vertex(-1f, -1f, -1f);
-		applet.vertex(-1f,  1f, -1f);
-		applet.vertex( 1f,  1f, -1f);
+		applet.vertex( size / 2, -size / 2, -size / 2);
+		applet.vertex(-size / 2, -size / 2, -size / 2);
+		applet.vertex(-size / 2,  size / 2, -size / 2);
+		applet.vertex( size / 2,  size / 2, -size / 2);
 
 		// Left side
-		applet.vertex(-1f,  1f,  1f);
-		applet.vertex(-1f,  1f, -1f);
-		applet.vertex(-1f, -1f, -1f);
-		applet.vertex(-1f, -1f,  1f);
+		applet.vertex(-size / 2,  size / 2,  size / 2);
+		applet.vertex(-size / 2,  size / 2, -size / 2);
+		applet.vertex(-size / 2, -size / 2, -size / 2);
+		applet.vertex(-size / 2, -size / 2,  size / 2);
 
 		// Right side
-		applet.vertex(1f,  1f, -1f);
-		applet.vertex(1f,  1f,  1f);
-		applet.vertex(1f, -1f,  1f);
-		applet.vertex(1f, -1f, -1f);
+		applet.vertex(size / 2,  size / 2, -size / 2);
+		applet.vertex(size / 2,  size / 2,  size / 2);
+		applet.vertex(size / 2, -size / 2,  size / 2);
+		applet.vertex(size / 2, -size / 2, -size / 2);
 
 		applet.endShape();
 		applet.popMatrix();
@@ -210,5 +192,34 @@ public class Cube extends SimpleGraphicObject3D {
 	@Override
 	public float getRotationZ() {
 		return rotationZ;
+	}
+
+	public void setTranslationX(float x)
+	{
+		this.translateX = x;
+	}
+	public void setTranslationY(float y)
+	{
+		this.translateY = y;
+	}
+	
+	public void setTranslationZ(float z)
+	{
+		this.translateZ = z;
+	}
+
+	public void setRotationX(float angle)
+	{
+		this.rotationX = angle;
+	}
+	
+	public void setRotationY(float angle)
+	{
+		this.rotationY = angle;
+	}
+	
+	public void setRotationZ(float angle)
+	{
+		this.rotationZ = angle;
 	}
 }

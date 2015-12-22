@@ -71,6 +71,14 @@ public abstract class GraphicObject3D {
     public abstract float getTranslationY();
     public abstract float getTranslationZ();
 
+    public abstract void setTranslationX(float x);
+    public abstract void setTranslationY(float y);
+    public abstract void setTranslationZ(float z);
+
+    public abstract void setRotationX(float angle);
+    public abstract void setRotationY(float angle);
+    public abstract void setRotationZ(float angle);
+
     public abstract PMatrix getTransformationMatrix();
 
 }
