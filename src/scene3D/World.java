@@ -3,8 +3,11 @@ package scene3D;
 
 
 import java.util.ArrayList;
+import java.util.Collection;
 
 import processing.core.PApplet;
+import scene3Dabstract.ComplexGraphicObject3D;
+import scene3Dabstract.GraphicObject3D;
 
 
 /**
@@ -12,14 +15,17 @@ import processing.core.PApplet;
  * @author Warren Godone-Maresca
  * @version 1.0
  */
-public class World {
+public class World extends ComplexGraphicObject3D<Cube> {
 	
 	Cube				boundingCube;
-	ArrayList <Cube>	cubesInWorld	= new ArrayList <Cube>();
+	Collection<Cube> cubesInWorld	= new ArrayList<Cube>();
 										
 										
 	public World(PApplet theApp)
 		{
+			super(new ArrayList<Cube>());
+			cubesInWorld = getCollection();
+
 			// Create a cube that will contain all the other cubes in the
 			// application and act as a barrier.
 			// Also remove the fill around the cube so we can see inside it.
@@ -45,23 +51,85 @@ public class World {
 					cubesInWorld.add(interiorCube);
 				}
 		}
-		
-		
+
+
+	@Override
+	public boolean isInside(float x, float y, float z) {
+		return false;
+	}
+
 	public void draw( )
 		{
-			
 			boundingCube.draw();
-			
-			for (int i = 0; i < cubesInWorld.size(); i++)
-				{
-					cubesInWorld.get(i).draw();
-				}
-				
+			super.draw();
 		}
-		
-		
-	public void update( )
-		{
-		
-		}
+
+	/**
+	 * Always returns null since the world has no rotation
+	 * @return null
+	 */
+	@Override
+	public GraphicObject3D getParent() {
+		return null;
+	}
+
+	@Override
+	public float getRotationX() {
+		return 0;
+	}
+
+	@Override
+	public float getRotationY() {
+		return 0;
+	}
+
+	@Override
+	public float getRotationZ() {
+		return 0;
+	}
+
+	@Override
+	public float getTranslationX() {
+		return 0;
+	}
+
+	@Override
+	public float getTranslationY() {
+		return 0;
+	}
+
+	@Override
+	public float getTranslationZ() {
+		return 0;
+	}
+
+	@Override
+	public void setTranslationX(float x) {
+
+	}
+
+	@Override
+	public void setTranslationY(float y) {
+
+	}
+
+	@Override
+	public void setTranslationZ(float z) {
+
+	}
+
+	@Override
+	public void setRotationX(float angle) {
+
+	}
+
+	@Override
+	public void setRotationY(float angle) {
+
+	}
+
+	@Override
+	public void setRotationZ(float angle) {
+
+	}
 }

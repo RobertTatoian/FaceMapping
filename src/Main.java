@@ -21,11 +21,9 @@ public class Main extends PApplet {
 							
 	private FaceDetector	faceDetector;
 	private DetectedFace	detectedFace;
-	private Cube			cube;
-							
+
 	private World			scene;
 							
-	float					cubeAngle	= 3.14f;
 	private boolean			debug		= false;
 										
 	private float			rotation	= 0;
