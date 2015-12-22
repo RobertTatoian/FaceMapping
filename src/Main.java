@@ -1,3 +1,4 @@
+import Abstract.Cube;
 import facemapping.DetectedFace;
 import facemapping.FaceDetector;
 import org.opencv.core.Core;
@@ -13,31 +14,37 @@ import processing.core.PImage;
 public class Main extends PApplet {
 	private FaceDetector faceDetector;
 	private DetectedFace detectedFace;
+	private Cube cube;
+
+	float cubeAngle = 3.14f;
 
 	public void settings()
 		{
 			size(640, 480, P3D);
-			surface.setResizable(false);
-
-			camera(640f, 480f, -600f, width / 2, height / 2, 0, 0, 1, 0);
 		}
 
 	public void setup()
 		{
 			faceDetector = new FaceDetector(this);
+			surface.setResizable(false);
+
+			camera(width / 2, height / 2, 600f, width / 2, height / 2, 0, 0, 1, 0);
 		}
 
 	public void draw()
 		{
+			background(200, 200, 200);
 			update();
 
-			image(faceDetector.getFrame(), 0, 0);
+			PImage frame = faceDetector.getFrame();
+			image(frame, 0, 0);
 
 			if (detectedFace != null)
 			{
 				PImage texture = detectedFace.toPImage();
 				image(texture, 0, 0, (200.0f / texture.height) * texture.width, 200);
 			}
+			cube.draw();
 		}
 
 	public void update()
@@ -47,6 +54,11 @@ public class Main extends PApplet {
 			{
 				detectedFace = face;
 			}
+
+			cubeAngle += 360 * 2;
+
+			cube = new Cube(width * 0.75f, width  / 4, 200, 20,
+											cubeAngle, 0, 0, this, null);
 		}
 
 	public void exitActual()

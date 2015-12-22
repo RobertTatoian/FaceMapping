@@ -15,8 +15,10 @@ public abstract class SimpleGraphicObject3D extends GraphicObject3D {
 		// Use PGraphics to get the transformation matrix. Might induce some overhead,
 		// but it's much simpler.
 		PGraphics g = new PGraphics3D();
-		g.rotate(180 / g.TWO_PI, getRotationX(), getRotationY(), getRotationZ());
 		g.translate(getTranslationX(), getTranslationY(), getTranslationZ());
+		g.rotateX(getRotationX());
+		g.rotateY(getRotationY());
+		g.rotateZ(getRotationZ());
 		return g.getMatrix();
 	}
 

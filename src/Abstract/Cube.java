@@ -71,11 +71,13 @@ public class Cube extends SimpleGraphicObject3D {
 		applet.pushMatrix();
 		//applet.scale(100f, 100f, 100f);
 
-		applet.rotate(180f / applet.TWO_PI, rotationX, rotationY, rotationZ);
 		applet.translate(translateX, translateY, translateZ);
+		applet.rotateX(rotationX);
+		applet.rotateY(rotationY);
+		applet.rotateZ(rotationZ);
 
-		applet.stroke(1f);
-		applet.strokeWeight(.01f);
+		applet.stroke(1, 1, 1);
+		applet.strokeWeight(1f);
 		//	applet.rect(0, 0, 10, 10);
 
 		applet.beginShape(PApplet.QUADS);

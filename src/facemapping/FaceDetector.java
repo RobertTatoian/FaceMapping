@@ -139,7 +139,6 @@ public class FaceDetector {
 				profile.x = grayFrame.width() - profile.x - profile.width;
 			}
 		}
-		System.out.println(profiles.cols() + " " + profiles.rows());
 
 		// each rectangle in faces is a face
 		Rect[] facesArray = faces.toArray();
