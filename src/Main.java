@@ -1,3 +1,4 @@
+import com.sun.webkit.dom.HTMLBRElementImpl;
 import facemapping.DetectedFace;
 import facemapping.FaceDetector;
 import org.opencv.core.Core;
@@ -30,9 +31,13 @@ public class Main extends PApplet {
 	private World			scene;
 							
 	private boolean			debug		= false;
-										
-	private float			rotation	= 0;
-										
+
+	private float rotation = PI, elevation = 0f;
+
+	private float centerX, centerY, centerZ;
+
+	private float eyeX = 360, eyeZ = 600;
+
 	public void settings( )
 		{
 			size(1024, 768, P3D);
@@ -41,8 +46,10 @@ public class Main extends PApplet {
 		
 	public void setup( )
 		{
+			noCursor();
+
 			faceDetector = new FaceDetector(this);
-			
+
 			surface.setResizable(false);
 			
 			// The initialization class does not need to know about the finer
@@ -51,9 +58,8 @@ public class Main extends PApplet {
 			
 			worldX = width / 2;
 			worldY = height / 2;
-			
 		}
-		
+
 		
 	public void draw( )
 		{
@@ -64,8 +70,8 @@ public class Main extends PApplet {
 			translate(worldX, worldY);
 			
 			// TODO Make the camera rotate around the entire cube.
-			camera(cos(rotation) * 360, 0, 600f, 0, 0, 0, 0, 1, 0);
-			
+			camera(eyeX, 0, eyeZ, eyeX + centerX, centerY, eyeZ + centerZ, 0, 1, 0);
+
 			update();
 			
 			PImage frame = faceDetector.getFrame();
@@ -155,19 +161,38 @@ public class Main extends PApplet {
 						break;
 					case 'a':
 						System.out.println("Left");
-						rotation -= 50;
+						eyeX -= 10;
 						break;
 					case 'd':
 						System.out.println("Right");
-						rotation += 50;
+						eyeX += 10;
+						break;
+					case 'w':
+						System.out.println("Forward");
+						eyeZ -= 10;
+						break;
+					case 's':
+						System.out.println("Backward");
+						eyeZ += 10;
 						break;
 					default:
 						System.out.println(key);
 						break;
 				}
 		}
-		
-		
+
+
+	@Override
+	public void mouseMoved()
+		{
+			rotation = TWO_PI - (mouseX * 1.f / width) * TWO_PI;
+			elevation = ((mouseY - height / 2f) * 0.5f / height) * HALF_PI;
+
+			centerX = cos(rotation) * cos(elevation);
+			centerY = sin(rotation) * sin(elevation);
+			centerZ = -cos(elevation);
+		}
+
 	public void exitActual( )
 		{
 			faceDetector.releaseCamera();
