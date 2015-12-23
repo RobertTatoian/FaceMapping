@@ -24,6 +24,12 @@ public class Main extends PApplet {
 	private static float WORLD_SCALE = 10;
 	
 	
+	/**
+	 * The main function of the application
+	 * 
+	 * @param _args
+	 *            Command line arguments
+	 */
 	public static void main(String _args[])
 		{
 			// Call system to load the OpenCV library
@@ -80,6 +86,9 @@ public class Main extends PApplet {
 	private int				worldX, worldY;
 							
 							
+	/**
+	 * The main draw loop of the application
+	 */
 	@Override
 	public void draw( )
 		{
@@ -89,7 +98,7 @@ public class Main extends PApplet {
 			
 			translate(worldX, worldY);
 			scale(worldToPixel, -worldToPixel);
-
+			
 			camera(eyeX, 0, eyeZ, eyeX + centerX, centerY, eyeZ + centerZ, 0, 1, 0);
 			
 			update();
@@ -124,6 +133,9 @@ public class Main extends PApplet {
 		}
 		
 		
+	/**
+	 * Detects if any keys were pressed in the Processing application
+	 */
 	@Override
 	public void keyPressed( )
 		{
@@ -159,8 +171,9 @@ public class Main extends PApplet {
 		}
 		
 		
-	// TODO what class should contain this method?
-	
+	/**
+	 * Detects if the mouse was moved in the Processing application
+	 */
 	@Override
 	public void mouseMoved( )
 		{
@@ -183,6 +196,9 @@ public class Main extends PApplet {
 		}
 		
 		
+	/**
+	 * Sets up the application
+	 */
 	@Override
 	public void setup( )
 		{
@@ -193,7 +209,7 @@ public class Main extends PApplet {
 			// The initialization class does not need to know about the finer
 			// details of the program.
 			scene = new World(this);
-
+			
 			worldX = width / 2;
 			worldY = height / 2;
 			
@@ -241,6 +257,9 @@ public class Main extends PApplet {
 		}
 		
 		
+	/**
+	 * The main update function of the application
+	 */
 	public void update( )
 		{
 			final DetectedFace face = faceDetector.detectFace();

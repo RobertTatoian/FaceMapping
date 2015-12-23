@@ -21,6 +21,8 @@ import processing.core.PImage;
 
 
 /**
+ * Detects the Face and subcomponents that make up a face.
+ * 
  * @author Robert Tatoian
  * @author Warren Godone-Maresca
  * @version 1.0
@@ -42,25 +44,49 @@ public class FaceDetector {
 	 */
 	private final DetectedFace		detectedFace		= new DetectedFace();
 														
+	/**
+	 * An OpenCV Cascade Classifier object for detecting the eyes.
+	 */
 	private final CascadeClassifier	eyesCascade			= new CascadeClassifier();
 														
+	/**
+	 * The trained Haar cascade for eye detection
+	 */
 	private final String			eyesCascadeName		= "CascadeClassifiers\\haarcascade_eye_tree_eyeglasses.xml";
+														
+	/**
+	 * An OpenCV Cascade Classifier object for detecting the face.
+	 */
 	private final CascadeClassifier	faceCascade			= new CascadeClassifier();
+														
+	/**
+	 * The trained Haar cascade for face detection
+	 */
 	private final String			faceCascadeName		= "CascadeClassifiers\\haarcascade_frontalface_alt.xml";
+														
 	/**
 	 * The current frame obtained from the webcam
 	 */
 	private final Mat				frame;
 									
 	/**
-	 * Classifiers for each part of the face
+	 * An OpenCV Cascade Classifier object for detecting the mouth.
 	 */
 	private final CascadeClassifier	mouthCascade		= new CascadeClassifier();
+														
 	/**
-	 * Filenames for each of the cascade classifiers
+	 * The trained Haar cascade for mouth detection
 	 */
 	private final String			mouthCascadeName	= "CascadeClassifiers\\haarcascade_smile.xml";
+														
+	/**
+	 * An OpenCV Cascade Classifier object for detecting the profile of a face.
+	 */
 	private final CascadeClassifier	profileCascade		= new CascadeClassifier();
+														
+	/**
+	 * The trained Haar cascade for profile detection
+	 */
 	private final String			profileCascadeName	= "CascadeClassifiers\\haarcascade_profileface.xml";
 														
 														
