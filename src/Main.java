@@ -1,6 +1,12 @@
+<<<<<<< HEAD
 import java.util.ArrayList;
 import java.util.List;
 
+=======
+import com.sun.webkit.dom.HTMLBRElementImpl;
+import facemapping.DetectedFace;
+import facemapping.FaceDetector;
+>>>>>>> origin/master
 import org.opencv.core.Core;
 
 import facemapping.DetectedFace;
@@ -31,6 +37,7 @@ public class Main extends PApplet {
 		}
 
 	private boolean			debug		= false;
+<<<<<<< HEAD
 	private DetectedFace	detectedFace;
 
 	private FaceDetector	faceDetector;
@@ -44,6 +51,38 @@ public class Main extends PApplet {
 							
 							
 	@Override
+=======
+
+	private float rotation = PI, elevation = 0f;
+
+	private float centerX, centerY, centerZ;
+
+	private float eyeX = 360, eyeZ = 600;
+
+	public void settings( )
+		{
+			size(1024, 768, P3D);
+		}
+		
+		
+	public void setup( )
+		{
+			noCursor();
+
+			faceDetector = new FaceDetector(this);
+
+			surface.setResizable(false);
+			
+			// The initialization class does not need to know about the finer
+			// details of the program.
+			scene = new World(this);
+			
+			worldX = width / 2;
+			worldY = height / 2;
+		}
+
+		
+>>>>>>> origin/master
 	public void draw( )
 		{
 			background(150);
@@ -51,8 +90,14 @@ public class Main extends PApplet {
 			pushMatrix();
 
 			translate(worldX, worldY);
+<<<<<<< HEAD
 
 			camera(cos(rotation) * 360, 0, 600f, 0, 0, 0, 0, 1, 0);
+=======
+			
+			// TODO Make the camera rotate around the entire cube.
+			camera(eyeX, 0, eyeZ, eyeX + centerX, centerY, eyeZ + centerZ, 0, 1, 0);
+>>>>>>> origin/master
 
 			update();
 
@@ -171,6 +216,7 @@ public class Main extends PApplet {
 			final DetectedFace face = faceDetector.detectFace();
 			if (face != null)
 				{
+<<<<<<< HEAD
 					detectedFace = face;
 				}
 
@@ -182,5 +228,56 @@ public class Main extends PApplet {
 					c.setFrontTexture(textures.get(1));
 					c.setRightTexture(textures.get(2));
 				}
+=======
+					case '`':
+						debug = !debug;
+						break;
+					case 'a':
+						System.out.println("Left");
+						eyeX -= 10;
+						break;
+					case 'd':
+						System.out.println("Right");
+						eyeX += 10;
+						break;
+					case 'w':
+						System.out.println("Forward");
+						eyeZ -= 10;
+						break;
+					case 's':
+						System.out.println("Backward");
+						eyeZ += 10;
+						break;
+					default:
+						System.out.println(key);
+						break;
+				}
+		}
+
+
+	@Override
+	public void mouseMoved()
+		{
+			rotation = TWO_PI - (mouseX * 1.f / width) * TWO_PI;
+			elevation = ((mouseY - height / 2f) * 0.5f / height) * HALF_PI;
+
+			centerX = cos(rotation) * cos(elevation);
+			centerY = sin(rotation) * sin(elevation);
+			centerZ = -cos(elevation);
+		}
+
+	public void exitActual( )
+		{
+			faceDetector.releaseCamera();
+		}
+		
+		
+	public static void main(String _args[])
+		{
+			// Call system to load the OpenCV library
+			System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
+			// Create the Processing window
+			PApplet.main(new String[ ] { Main.class.getName() });
+>>>>>>> origin/master
 		}
 }
