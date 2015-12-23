@@ -83,7 +83,7 @@ public class Cube extends SimpleGraphicObject3D {
 			PVector pos = parentToRelativeCoordinates(x, y, z);
 			return relativeBoundingBox.isInside(pos.x, pos.y, pos.z);
 		}
-	
+
 	public boolean intersects(Cube cube)
 		{
 			List <PVector> myVertices = getVertices();
