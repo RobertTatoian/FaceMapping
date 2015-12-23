@@ -2,11 +2,6 @@
 import java.util.ArrayList;
 import java.util.List;
 
-
-import com.sun.webkit.dom.HTMLBRElementImpl;
-import facemapping.DetectedFace;
-import facemapping.FaceDetector;
-
 import org.opencv.core.Core;
 
 import facemapping.DetectedFace;
@@ -36,47 +31,27 @@ public class Main extends PApplet {
 			PApplet.main(new String[ ] { Main.class.getName() });
 		}
 
+	private float			centerX, centerY, centerZ;
+							
 	private boolean			debug		= false;
-
+										
 	private DetectedFace	detectedFace;
 
+	private final float		eyeX		= 360,
+	                                eyeZ = 600;
+									
+									
 	private FaceDetector	faceDetector;
 
+	private float			rotation	= PI,
+	                                elevation = 0f;
+
 	private World			scene;
-							
-							
+
 	private int				worldX, worldY;
 							
-	private float rotation = PI, elevation = 0f;
-
-	private float centerX, centerY, centerZ;
-
-	private float eyeX = 360, eyeZ = 600;
-
-	public void settings( )
-		{
-			size(1024, 768, P3D);
-		}
-		
-		
-	public void setup( )
-		{
-			noCursor();
-
-			faceDetector = new FaceDetector(this);
-
-			surface.setResizable(false);
-			
-			// The initialization class does not need to know about the finer
-			// details of the program.
-			scene = new World(this);
-			
-			worldX = width / 2;
-			worldY = height / 2;
-		}
-
-		
-
+							
+	@Override
 	public void draw( )
 		{
 			background(150);
@@ -88,7 +63,7 @@ public class Main extends PApplet {
 
 			camera(cos(rotation) * 360, 0, 600f, 0, 0, 0, 0, 1, 0);
 
-			
+
 			// TODO Make the camera rotate around the entire cube.
 			camera(eyeX, 0, eyeZ, eyeX + centerX, centerY, eyeZ + centerZ, 0, 1, 0);
 
@@ -143,9 +118,45 @@ public class Main extends PApplet {
 						break;
 				}
 		}
-		
-		
-		
+
+
+	@Override
+	public void mouseMoved( )
+		{
+			rotation = TWO_PI - (((mouseX * 1.f) / width) * TWO_PI);
+			elevation = (((mouseY - (height / 2f)) * 0.5f) / height) * HALF_PI;
+
+			centerX = cos(rotation) * cos(elevation);
+			centerY = sin(rotation) * sin(elevation);
+			centerZ = -cos(elevation);
+		}
+
+
+	@Override
+	public void settings( )
+		{
+			size(1024, 768, P3D);
+		}
+
+
+	@Override
+	public void setup( )
+		{
+			noCursor();
+
+			faceDetector = new FaceDetector(this);
+
+			surface.setResizable(false);
+
+			// The initialization class does not need to know about the finer
+			// details of the program.
+			scene = new World(this);
+
+			worldX = width / 2;
+			worldY = height / 2;
+		}
+
+
 	// what class should contain this method?
 	/**
 	 * Takes the output of a face texture and splits it into three textures for
@@ -205,16 +216,4 @@ public class Main extends PApplet {
 		}
 
 
-	@Override
-	public void mouseMoved()
-		{
-			rotation = TWO_PI - (mouseX * 1.f / width) * TWO_PI;
-			elevation = ((mouseY - height / 2f) * 0.5f / height) * HALF_PI;
-
-			centerX = cos(rotation) * cos(elevation);
-			centerY = sin(rotation) * sin(elevation);
-			centerZ = -cos(elevation);
-		}
-
-		
 }
