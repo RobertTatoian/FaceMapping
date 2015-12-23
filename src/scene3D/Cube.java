@@ -28,7 +28,7 @@ public class Cube extends SimpleGraphicObject3D {
 	private boolean			isBounding	= true;
 										
 	private PImage			frontTexture, leftTexture, rightTexture;
-							
+
 	private float			xRotationalVelocity;
 							
 	private float			yRotationalVelocity;
@@ -58,9 +58,9 @@ public class Cube extends SimpleGraphicObject3D {
 			translateY = y;
 			translateZ = z;
 			
-			rotationX = rotX;
-			rotationY = rotY;
-			rotationZ = rotZ;
+			rotationX = 0;//rotX;
+			rotationY = 0;//rotY;
+			rotationZ = 0;//rotZ;
 			
 			this.size = size;
 			
@@ -165,12 +165,12 @@ public class Cube extends SimpleGraphicObject3D {
 		{
 			applet.pushMatrix();
 			applet.textureMode(PConstants.NORMAL);
-			
+
 			applet.translate(translateX, translateY, translateZ);
 			applet.rotateX(rotationX);
 			applet.rotateY(rotationY);
 			applet.rotateZ(rotationZ);
-			
+
 			applet.stroke(1, 1, 1);
 			applet.strokeWeight(1f);
 			
@@ -257,6 +257,7 @@ public class Cube extends SimpleGraphicObject3D {
 					rotationY += yRotationalVelocity;
 					rotationZ += zRotationalVelocity;
 				}
+			computeAbsoluteBoundingBox();
 		}
 		
 		
@@ -288,7 +289,7 @@ public class Cube extends SimpleGraphicObject3D {
 					yMin = Math.min(yMin, corner.y);
 					zMin = Math.min(zMin, corner.z);
 				}
-				
+
 			absoluteBoundingBox = new BoundingBox3D(xMin, yMin, zMin, xMax - xMin, yMax - yMin, zMax - zMin);
 		}
 		
@@ -319,7 +320,7 @@ public class Cube extends SimpleGraphicObject3D {
 				{
 					vertices.set(i, relativeToParentCoordinates(vertices.get(i)));
 				}
-				
+
 			return vertices;
 		}
 		
@@ -478,5 +479,29 @@ public class Cube extends SimpleGraphicObject3D {
 
 	public void setColor(int color) {
 		this.color = color;
+	}
+
+	public float getXRotationalVelocity() {
+		return xRotationalVelocity;
+	}
+
+	public float getYRotationalVelocity() {
+		return yRotationalVelocity;
+	}
+
+	public float getZRotationalVelocity() {
+		return zRotationalVelocity;
+	}
+
+	public float getXTranslationalVelocity() {
+		return xTranslationalVelocity;
+	}
+
+	public float getYTranslationalVelocity() {
+		return yTranslationalVelocity;
+	}
+
+	public float getZTranslationalVelocity() {
+		return zTranslationalVelocity;
 	}
 }

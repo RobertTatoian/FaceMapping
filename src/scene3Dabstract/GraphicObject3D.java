@@ -162,6 +162,9 @@ public abstract class GraphicObject3D {
 			g.rotateX(getRotationX());
 			g.rotateY(getRotationY());
 			g.rotateZ(getRotationZ());
+
+		//	System.out.println(getTranslationX() + " " + getTranslationY() + " " + getTranslationZ());
+		//	g.printMatrix();
 			return g.getMatrix();
 		}
 

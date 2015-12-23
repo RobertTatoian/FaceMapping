@@ -58,7 +58,7 @@ public class BoundingBox3D {
 
 	public float getMinY()
 		{
-			return z;
+			return y;
 		}
 
 	public float getMinZ()
@@ -80,4 +80,19 @@ public class BoundingBox3D {
 		{
 			return z + length;
 		}
+
+	public float getWidth()
+	{
+		return width;
+	}
+
+	public float getHeight()
+	{
+		return height;
+	}
+
+	public float getLength()
+	{
+		return length;
+	}
 }

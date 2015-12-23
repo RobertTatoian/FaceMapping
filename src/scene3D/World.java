@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import processing.core.PApplet;
+import scene3Dabstract.BoundingBox3D;
 import scene3Dabstract.ComplexGraphicObject3D;
 import scene3Dabstract.GraphicObject3D;
 
@@ -35,7 +36,7 @@ public class World extends ComplexGraphicObject3D<Cube> {
 			boundingCube.setFill(false);
 			
 			// Randomly decide the number of cubes we should generate.
-			int numberOfCubesToGenerate = (int)theApp.random(2.0f, 10.0f);
+			int numberOfCubesToGenerate = (int)theApp.random(3.0f, 10.0f);
 			
 			// Generate the cubes and add them to the array list.
 			for (int i = 0; i < numberOfCubesToGenerate; i++)
@@ -68,9 +69,43 @@ public class World extends ComplexGraphicObject3D<Cube> {
 
 	public void update( )
 	{
+		BoundingBox3D bounds = boundingCube.getAbsoluteBoundingBox();
 		for (Cube cube : cubesInWorld)
 			{
+				BoundingBox3D absolute = cube.getAbsoluteBoundingBox();
 
+				if (absolute.getMinX() < bounds.getMinX())
+					{
+						cube.setTranslationX(bounds.getMinX() + Math.abs(cube.getTranslationX() - absolute.getMinX()));
+						cube.setXTranslationalVelocity(-cube.getXTranslationalVelocity());
+					}
+				else if (absolute.getMaxX() > bounds.getMaxX())
+					{
+						cube.setTranslationX(bounds.getMaxX() - Math.abs(cube.getTranslationX() - absolute.getMaxX()));
+						cube.setXTranslationalVelocity(-cube.getXTranslationalVelocity());
+					}
+
+				if (absolute.getMinY() < bounds.getMinY())
+					{
+						cube.setTranslationY(bounds.getMinY() +  Math.abs(cube.getTranslationY() - absolute.getMinY()));
+						cube.setYTranslationalVelocity(-cube.getYTranslationalVelocity());
+					}
+				else if (absolute.getMaxY() > bounds.getMaxY())
+					{
+						cube.setTranslationY(bounds.getMaxY() - Math.abs(cube.getTranslationY() - absolute.getMaxY()));
+						cube.setYTranslationalVelocity(-cube.getYTranslationalVelocity());
+					}
+
+				if (absolute.getMinZ() < bounds.getMinZ())
+					{
+						cube.setTranslationZ(bounds.getMinZ() + Math.abs(cube.getTranslationZ() - absolute.getMinZ()));
+						cube.setZTranslationalVelocity(-cube.getZTranslationalVelocity());
+					}
+				else if (absolute.getMaxZ() > bounds.getMaxZ())
+					{
+						cube.setTranslationZ(bounds.getMaxZ() - Math.abs(cube.getTranslationZ() - absolute.getMaxZ()));
+						cube.setZTranslationalVelocity(-cube.getZTranslationalVelocity());
+					}
 			}
 
 		super.update();
