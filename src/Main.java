@@ -108,13 +108,7 @@ public class Main extends PApplet {
 				{
 					image(frame, -worldX, -worldY);
 				}
-<<<<<<< HEAD
 
-			if ((detectedFace != null) && debug)
-				{
-					final PImage texture = detectedFace.toPImage();
-
-=======
 				
 			if (detectedFace != null && debug)
 				{
@@ -122,7 +116,7 @@ public class Main extends PApplet {
 
 					pushMatrix();
 					translate(0, 0, 1);
->>>>>>> origin/master
+
 					image(texture, -worldX, -worldY, (200.0f / texture.height) * texture.width, 200);
 					popMatrix();
 				}
@@ -140,7 +134,9 @@ public class Main extends PApplet {
 				text("Please turn the camera to the left", width / 2, height / 2, 0);
 				popMatrix();
 			}
+			
 		}
+		
 
 
 	/**
