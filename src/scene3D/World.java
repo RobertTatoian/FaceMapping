@@ -247,7 +247,7 @@ public class World extends ComplexGraphicObject3D <Cube> {
 		}
 
 	/**
-	 * @throws NotImplementedException
+	 * @throws NotImplementedException This method has not been implemented.
 	 */
 	@Override
 	public void setRotationX(float angle)

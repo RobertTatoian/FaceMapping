@@ -17,7 +17,15 @@ import java.util.List;
  * @version 1.0
  */
 public class Main extends PApplet {
-
+	/**
+	 * The scale of the world, one pixel equals ten meters.
+	 */
+	private static float WORLD_SCALE = 10;
+	
+	/**
+	 * Allows the conversion between world and pixel coordinates.
+	 */
+	private float pixelToWorld, worldToPixel;
 	/**
 	 * The origin of the world in pixel coordinates.
 	 */
@@ -51,13 +59,16 @@ public class Main extends PApplet {
 	/**
 	 * Center vector of the camera
 	 */
-	private float centerX, centerY, centerZ;
+	private float centerX, centerY, centerZ = 0;
 
 	/**
 	 * Position of the camera
 	 */
 	private float eyeX = 360, eyeZ = 600;
-
+	
+	/**
+	 * Called to handle setting the size of the window.
+	 */
 	public void settings( )
 		{
 			size(1024, 768, P3D);
@@ -73,9 +84,12 @@ public class Main extends PApplet {
 			// The initialization class does not need to know about the finer
 			// details of the program.
 			scene = new World(this);
-
+			
 			worldX = width / 2;
 			worldY = height / 2;
+
+			pixelToWorld = WORLD_SCALE/worldX;
+			worldToPixel = (width/2)/WORLD_SCALE;
 		}
 
 
@@ -86,8 +100,8 @@ public class Main extends PApplet {
 			pushMatrix();
 
 			translate(worldX, worldY);
-
-			// TODO Make the camera rotate around the entire cube.
+			scale(worldToPixel,-worldToPixel);
+			
 			camera(eyeX, 0, eyeZ, eyeX + centerX, centerY, eyeZ + centerZ, 0, 1, 0);
 
 			update();
@@ -170,6 +184,7 @@ public class Main extends PApplet {
 			return textures;
 		}
 
+	
 	public void keyPressed( )
 		{
 			switch (key)
@@ -214,10 +229,15 @@ public class Main extends PApplet {
 			centerY = sin(rotation) * sin(elevation);
 			centerZ = -cos(elevation);
 		}
-
+	
+	/**
+	 * Instructs the Processing application that it's time to exit the program.
+	 */
+	@Override
 	public void exitActual( )
 		{
 			faceDetector.releaseCamera();
+			System.exit(0);
 		}
 
 
