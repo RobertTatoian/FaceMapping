@@ -94,47 +94,44 @@ public class Main extends PApplet {
 		{
 			background(150);
 
-			pushMatrix();
-
-			translate(worldX, worldY);
-			scale(worldToPixel, -worldToPixel);
-
-			camera(eyeX, 0, eyeZ, eyeX + centerX, centerY, eyeZ + centerZ, 0, 1, 0);
-
 			update();
 			final PImage frame = faceDetector.getFrame();
 
 			if (debug)
 				{
-					image(frame, -worldX, -worldY);
-				}
+					image(frame, 0, 0, width, height);
 
-				
-			if (detectedFace != null && debug)
-				{
 					final PImage texture = detectedFace.toPImage();
 
 					pushMatrix();
 					translate(0, 0, 1);
 
-					image(texture, -worldX, -worldY, (200.0f / texture.height) * texture.width, 200);
+					image(texture, 0, 0, (200.0f / texture.height) * texture.width, 200);
 					popMatrix();
 				}
+			else
+				{
+					pushMatrix();
 
-			scene.draw();
+					translate(worldX, worldY);
+					scale(worldToPixel, -worldToPixel);
 
-			popMatrix();
+					camera(eyeX, 0, eyeZ, eyeX + centerX, centerY, eyeZ + centerZ, 0, 1, 0);
+
+					scene.draw();
+					popMatrix();
 
 
-			if (mouseX > width * 2 / 3)
-			{
-				pushMatrix();
-				fill(0, 0, 0);
-				textAlign(CENTER, BOTTOM);
-				text("Please turn the camera to the left", width / 2, height / 2, 0);
-				popMatrix();
-			}
-			
+					if (mouseX > width * 2 / 3)
+						{
+							pushMatrix();
+							fill(0, 0, 0);
+							textAlign(CENTER, BOTTOM);
+							text("Please turn the camera to the left", width / 2, height / 2, 0);
+							popMatrix();
+						}
+				}
+
 		}
 		
 
@@ -158,7 +155,7 @@ public class Main extends PApplet {
 		{
 			switch (key)
 				{
-					case '`':
+					case '\b':
 						debug = !debug;
 						break;
 					case 'a':
