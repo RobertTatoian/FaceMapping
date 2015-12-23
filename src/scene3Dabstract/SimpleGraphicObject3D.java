@@ -1,9 +1,5 @@
-package scene3Dabstract;
 
-import processing.core.PGraphics;
-import processing.core.PMatrix;
-import processing.core.PVector;
-import processing.opengl.PGraphics3D;
+package scene3Dabstract;
 
 /**
  * Created by wpgodone on 12/21/2015.
