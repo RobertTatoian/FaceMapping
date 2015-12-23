@@ -19,6 +19,11 @@ import org.opencv.videoio.VideoCapture;
 import processing.core.PImage;
 
 /**
+ * 
+ * 
+ * @author Robert Tatoian
+ * @author Warren Godone-Maresca
+ * @version 1.0
  */
 public class FaceDetector {
 

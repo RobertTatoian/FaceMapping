@@ -4,6 +4,10 @@ package scene3Dabstract;
 
 /**
  * A generic, immutable bounding box in 3d.
+ * 
+ * @author Robert Tatoian
+ * @author Warren Godone-Maresca
+ * @version 1.0
  */
 public class BoundingBox3D {
 

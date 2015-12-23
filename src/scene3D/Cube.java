@@ -15,7 +15,12 @@ import scene3Dabstract.BoundingBox3D;
 import scene3Dabstract.GraphicObject3D;
 import scene3Dabstract.SimpleGraphicObject3D;
 
-
+/**
+ * 
+ * @author Robert Tatoian
+ * @author Warren Godone-Maresca
+ * @version 1.0
+ */
 public class Cube extends SimpleGraphicObject3D {
 	
 	private BoundingBox3D		absoluteBoundingBox;

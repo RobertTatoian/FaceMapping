@@ -12,6 +12,11 @@ import processing.opengl.PGraphics3D;
  * here. - has a rotation and translation relative to the parent if it is not
  * null, or relative to the world coordinates otherwise - can be drawn - can be
  * updated - can determine if it contains some point given in world coordinates
+ * 
+ * 
+ * @author Robert Tatoian
+ * @author Warren Godone-Maresca
+ * @version 1.0
  */
 public abstract class GraphicObject3D {
 	

@@ -13,6 +13,11 @@ import processing.core.PImage;
 /**
  * Encapsulates the information for a detected face and generates a PImage of the
  * overall face.
+ * 
+ * @author Robert Tatoian
+ * @author Warren Godone-Maresca
+ * @version 1.0
+ * 
  */
 public class DetectedFace {
 
