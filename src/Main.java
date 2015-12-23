@@ -12,29 +12,50 @@ import java.util.List;
 
 
 /**
- * Displays and manages 3 frames: 1. The face texture 2. The webcam input (with
- * rectangles showing detected features) 3. A 3d shape with the face texture
- * mapped onto it
- *
  * @author Robert Tatoian
  * @author Warren Godone-Maresca
  * @version 1.0
  */
 public class Main extends PApplet {
 
-	private int				worldX, worldY;
+	/**
+	 * The origin of the world in pixel coordinates.
+	 */
+	private int	worldX, worldY;
 
+	/**
+	 * A FaceDetector to .. detect faces!
+	 */
 	private FaceDetector	faceDetector;
+
+	/**
+	 * Maintains a PImage of the face being detected
+	 */
 	private DetectedFace	detectedFace;
 
-	private World			scene;
+	/**
+	 * The scene
+	 */
+	private World scene;
 
-	private boolean			debug		= false;
+	/**
+	 * Determines whether we're in debug mode.
+	 */
+	private boolean	debug = false;
 
+	/**
+	 * Rotation and elevation (yaw and pitch) of the camera.
+	 */
 	private float rotation = PI, elevation = 0f;
 
+	/**
+	 * Center vector of the camera
+	 */
 	private float centerX, centerY, centerZ;
 
+	/**
+	 * Position of the camera
+	 */
 	private float eyeX = 360, eyeZ = 600;
 
 	public void settings( )
@@ -116,8 +137,10 @@ public class Main extends PApplet {
 	 * each side of a cube accounting for the position of the origin in image
 	 * coordinates.
 	 *
-	 * @param face
-	 * @return
+	 * @param face A detected face
+	 * @return A list of three square textures containing (in order): the left
+	 *         side of the face, the front of the face, and the right side of
+	 *         the face.
 	 */
 	private List <PImage> splitFaceTexture(DetectedFace face)
 		{
@@ -146,7 +169,6 @@ public class Main extends PApplet {
 
 			return textures;
 		}
-
 
 	public void keyPressed( )
 		{
