@@ -1,4 +1,3 @@
-import com.sun.webkit.dom.HTMLBRElementImpl;
 import facemapping.DetectedFace;
 import facemapping.FaceDetector;
 import org.opencv.core.Core;
@@ -16,20 +15,20 @@ import java.util.List;
  * Displays and manages 3 frames: 1. The face texture 2. The webcam input (with
  * rectangles showing detected features) 3. A 3d shape with the face texture
  * mapped onto it
- * 
+ *
  * @author Robert Tatoian
  * @author Warren Godone-Maresca
  * @version 1.0
  */
 public class Main extends PApplet {
-	
+
 	private int				worldX, worldY;
-							
+
 	private FaceDetector	faceDetector;
 	private DetectedFace	detectedFace;
-							
+
 	private World			scene;
-							
+
 	private boolean			debug		= false;
 
 	private float rotation = PI, elevation = 0f;
@@ -42,60 +41,55 @@ public class Main extends PApplet {
 		{
 			size(1024, 768, P3D);
 		}
-		
-		
+
+
 	public void setup( )
 		{
-
 			faceDetector = new FaceDetector(this);
 
 			surface.setResizable(false);
-			
+
 			// The initialization class does not need to know about the finer
 			// details of the program.
 			scene = new World(this);
-			
+
 			worldX = width / 2;
 			worldY = height / 2;
 		}
 
-		
+
 	public void draw( )
 		{
 			background(150);
-			
+
 			pushMatrix();
-			
+
 			translate(worldX, worldY);
 
 			// TODO Make the camera rotate around the entire cube.
 			camera(eyeX, 0, eyeZ, eyeX + centerX, centerY, eyeZ + centerZ, 0, 1, 0);
 
 			update();
-			strokeWeight(1f);
-			stroke(255, 0, 0);
-			line(0, 0, 0, 100, 0, 0);
-			
 			PImage frame = faceDetector.getFrame();
-			
+
 			if (debug)
 				{
 					image(frame, -worldX, -worldY);
 				}
-				
+
 			if (detectedFace != null && debug)
 				{
 					PImage texture = detectedFace.toPImage();
-					
+
 					image(texture, -worldX, -worldY, (200.0f / texture.height) * texture.width, 200);
 				}
-				
+
 			scene.draw();
-			
+
 			popMatrix();
 		}
-		
-		
+
+
 	public void update( )
 		{
 			DetectedFace face = faceDetector.detectFace();
@@ -113,10 +107,10 @@ public class Main extends PApplet {
 					c.setRightTexture(textures.get(2));
 				}
 		}
-		
-		
+
+
 	// TODO what class should contain this method?
-	
+
 	/**
 	 * Takes the output of a face texture and splits it into three textures for
 	 * each side of a cube accounting for the position of the origin in image
@@ -132,13 +126,13 @@ public class Main extends PApplet {
 			PImage left = new PImage(300, 300);
 			PImage front = new PImage(300, 300);
 			PImage right = new PImage(300, 300);
-			
+
 			for (int i = 0; i < 300; i++)
 				{
 					for (int j = 0; j < 300; j++)
 						{
 							front.set(i, j, faceTexture.get(i + 100, 300 - j));
-							
+
 							if (i < 100)
 								{
 									left.set(i + 200, 300 - j, faceTexture.get(i, j));
@@ -149,11 +143,11 @@ public class Main extends PApplet {
 			textures.add(left);
 			textures.add(front);
 			textures.add(right);
-			
+
 			return textures;
 		}
-		
-		
+
+
 	public void keyPressed( )
 		{
 			switch (key)
@@ -204,8 +198,8 @@ public class Main extends PApplet {
 		{
 			faceDetector.releaseCamera();
 		}
-		
-		
+
+
 	public static void main(String _args[])
 		{
 			// Call system to load the OpenCV library
