@@ -163,10 +163,20 @@ public abstract class GraphicObject3D {
 			g.rotateY(getRotationY());
 			g.rotateZ(getRotationZ());
 
-		//	System.out.println(getTranslationX() + " " + getTranslationY() + " " + getTranslationZ());
-		//	g.printMatrix();
 			return g.getMatrix();
 		}
+
+	public PMatrix getRotationMatrix()
+	{
+		// Use PGraphics to get the transformation matrix. Might induce some overhead,
+		// but it's much simpler.
+		PGraphics g = new PGraphics3D();
+		g.rotateX(getRotationX());
+		g.rotateY(getRotationY());
+		g.rotateZ(getRotationZ());
+
+		return g.getMatrix();
+	}
 
 	/**
 	 * Converts a point in the parent's coordinate system to this object's reference

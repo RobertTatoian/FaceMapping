@@ -1,10 +1,7 @@
 
 package scene3D;
 
-import processing.core.PApplet;
-import processing.core.PConstants;
-import processing.core.PImage;
-import processing.core.PVector;
+import processing.core.*;
 import scene3Dabstract.BoundingBox3D;
 import scene3Dabstract.GraphicObject3D;
 import scene3Dabstract.SimpleGraphicObject3D;
@@ -86,21 +83,8 @@ public class Cube extends SimpleGraphicObject3D {
 			PVector pos = parentToRelativeCoordinates(x, y, z);
 			return relativeBoundingBox.isInside(pos.x, pos.y, pos.z);
 		}
-		
-		
+	
 	public boolean intersects(Cube cube)
-		{
-			List <PVector> vertices = cube.getVertices();
-			
-			for (PVector pos : vertices)
-				{
-					if (absoluteBoundingBox.isInside(pos.x, pos.y, pos.z)) { return true; }
-				}
-			return false;
-		}
-		
-		
-	public boolean intersectsSAT(Cube cube)
 		{
 			List <PVector> myVertices = getVertices();
 			List <PVector> cubeVertices = cube.getVertices();
@@ -121,10 +105,9 @@ public class Cube extends SimpleGraphicObject3D {
 				}
 				
 			for (PVector myNormal : normalVecs)
-				for (PVector cubeNormal : cubeNormals)
+				for (PVector normal : cubeNormals)
 					{
-						if (disjointAlongAxis(myVertices, cubeVertices, myNormal.cross(
-										cubeNormal)))
+						if (disjointAlongAxis(myVertices, cubeVertices, myNormal.cross(normal)))
 							return false;
 					}
 					
@@ -135,6 +118,11 @@ public class Cube extends SimpleGraphicObject3D {
 	private boolean disjointAlongAxis(List<PVector> myVertices,
 																		List<PVector> otherVertices, PVector axis)
 		{
+			if (axis.x == 0 && axis.y == 0 && axis.z == 0)
+				{
+					return false;
+				}
+
 			float myMax = Float.NEGATIVE_INFINITY, myMin = Float.POSITIVE_INFINITY;
 			float cubeMax = Float.NEGATIVE_INFINITY, cubeMin = Float.POSITIVE_INFINITY;
 			
@@ -156,7 +144,7 @@ public class Cube extends SimpleGraphicObject3D {
 
 			float totalLength = (myMax - myMin) + (cubeMax - cubeMin);
 			float totalSpan = Math.max(myMax, cubeMax) - Math.min(myMin, cubeMin);
-			return totalSpan >= totalLength;
+			return totalSpan > totalLength;
 		}
 		
 		
@@ -173,7 +161,7 @@ public class Cube extends SimpleGraphicObject3D {
 
 			applet.stroke(1, 1, 1);
 			applet.strokeWeight(1f);
-			
+
 			// BEGIN CUBE
 			if (isBounding)
 				{
@@ -327,11 +315,23 @@ public class Cube extends SimpleGraphicObject3D {
 		
 	public List <PVector> getNormalVectors( )
 		{
-			List <PVector> vertices = new LinkedList <PVector>();
-			vertices.add(relativeToParentCoordinates(new PVector(1, 0, 0)));
-			vertices.add(relativeToParentCoordinates(new PVector(0, 1, 0)));
-			vertices.add(relativeToParentCoordinates(new PVector(0, 0, 1)));
-			return vertices;
+			List <PVector> normals = new LinkedList <PVector>();
+
+			PMatrix rotMatrix = getRotationMatrix();
+
+			PVector current = new PVector(1, 0, 0);
+			current = rotMatrix.mult(current, null);
+			normals.add(current);
+
+			current = new PVector(0, 1, 0);
+			current = rotMatrix.mult(current, null);
+			normals.add(current);
+
+			current = new PVector(0, 0, 1);
+			current = rotMatrix.mult(current, null);
+			normals.add(current);
+
+			return normals;
 		}
 		
 		
@@ -503,5 +503,12 @@ public class Cube extends SimpleGraphicObject3D {
 
 	public float getZTranslationalVelocity() {
 		return zTranslationalVelocity;
+	}
+
+	public void reverseTranslationalVelocity()
+	{
+		xTranslationalVelocity *= -1;
+		yTranslationalVelocity *= -1;
+		zTranslationalVelocity *= -1;
 	}
 }

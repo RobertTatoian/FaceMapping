@@ -223,8 +223,8 @@ public class DetectedFace {
 					if (r < 30 && g < 30 && b < 30)
 					{
 					//	output.set(i, j, (r + g + b) / 3);
-					//	output.set(i, j, 0xFFF0000);
-						output.set(i, j, output.get(250, 100));
+					 	output.set(i, j, 0xFF000000);
+						//output.set(i, j, output.get(250, 100));
 					}
 
 					output.set(output.width - i, j, output.get(i, j));
