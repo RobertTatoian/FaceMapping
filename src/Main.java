@@ -264,7 +264,7 @@ public class Main extends PApplet {
 
 							if (i < 100)
 								{
-									left.set(i + 200, 300 - j, faceTexture.get(i, j));
+									left.set(i + 200, 300 - j, faceTexture.get(500 - i, j));
 									right.set(i, 300 - j, faceTexture.get(i + 400, j));
 								}
 						}

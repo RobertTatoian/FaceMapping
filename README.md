@@ -14,8 +14,8 @@ This project has the following features:
 # Usage
 Run `main.java` to start the program.
 
-+ Press backspace to enter "debug mode" and see camera input. The cumulative face
-  texture is displayed in the top left corner in debug mode.
++ Press backspace to toggle "debug mode". In debug mode you can see camera input
+  and the cumulative face texture is displayed in the top left corner.
 + Press the "w" key to move the camera forward.
 + Press the "s" key to move the camera backward.
 + Press the "a" key to move the camera left.
