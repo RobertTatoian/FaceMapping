@@ -40,6 +40,8 @@ public class Cube extends SimpleGraphicObject3D {
 	private float			yTranslationalVelocity;
 							
 	private float			zTranslationalVelocity;
+
+	private int color = 0xFF00A0A0; // default
 							
 							
 	public Cube(float x, float y, float z, float size, PApplet applet)
@@ -175,7 +177,7 @@ public class Cube extends SimpleGraphicObject3D {
 			// BEGIN CUBE
 			if (isBounding)
 				{
-					applet.fill(0, 100, 100);
+					applet.fill(color);
 				}
 			else
 				{
@@ -439,5 +441,42 @@ public class Cube extends SimpleGraphicObject3D {
 		{
 			this.rightTexture = rightTexture;
 		}
-		
+
+	public void setXRotationalVelocity(float velocity)
+		{
+			this.xRotationalVelocity = velocity;
+		}
+
+	public void setYRotationalVelocity(float velocity)
+		{
+			this.yRotationalVelocity = velocity;
+		}
+
+	public void setXZotationalVelocity(float velocity)
+		{
+			this.zRotationalVelocity = velocity;
+		}
+
+	public void setXTranslationalVelocity(float velocity)
+		{
+			this.xTranslationalVelocity = velocity;
+		}
+
+	public void setYTranslationalVelocity(float velocity)
+		{
+			this.yTranslationalVelocity = velocity;
+		}
+
+	public void setZTranslationalVelocity(float velocity)
+	{
+		this.zTranslationalVelocity = velocity;
+	}
+
+	public int getColor() {
+		return color;
+	}
+
+	public void setColor(int color) {
+		this.color = color;
+	}
 }

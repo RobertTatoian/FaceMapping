@@ -50,4 +50,34 @@ public class BoundingBox3D {
 							&& this.y <= y && y <= this.y + height
 							&& this.z <= z && z <= this.z + length;
 		}
+
+	public float getMinX()
+		{
+			return x;
+		}
+
+	public float getMinY()
+		{
+			return z;
+		}
+
+	public float getMinZ()
+		{
+			return z;
+		}
+
+	public float getMaxX()
+		{
+			return x + width;
+		}
+
+	public float getMaxY()
+		{
+			return y + height;
+		}
+
+	public float getMaxZ()
+		{
+			return z + length;
+		}
 }

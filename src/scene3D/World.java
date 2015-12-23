@@ -17,8 +17,10 @@ import scene3Dabstract.GraphicObject3D;
  */
 public class World extends ComplexGraphicObject3D<Cube> {
 	
-	Cube				boundingCube;
-	Collection<Cube> cubesInWorld	= new ArrayList<Cube>();
+	private Cube				boundingCube;
+	private Collection<Cube> cubesInWorld	= new ArrayList<Cube>();
+
+	private static final int BOUNDING_CUBE_SIZE = 400;
 										
 										
 	public World(PApplet theApp)
@@ -29,7 +31,7 @@ public class World extends ComplexGraphicObject3D<Cube> {
 			// Create a cube that will contain all the other cubes in the
 			// application and act as a barrier.
 			// Also remove the fill around the cube so we can see inside it.
-			boundingCube = new Cube(0, 0, 0, 400, theApp);
+			boundingCube = new Cube(0, 0, 0, BOUNDING_CUBE_SIZE, theApp);
 			boundingCube.setFill(false);
 			
 			// Randomly decide the number of cubes we should generate.
@@ -60,9 +62,19 @@ public class World extends ComplexGraphicObject3D<Cube> {
 
 	public void draw( )
 		{
-			boundingCube.draw();
 			super.draw();
+			boundingCube.draw();
 		}
+
+	public void update( )
+	{
+		for (Cube cube : cubesInWorld)
+			{
+
+			}
+
+		super.update();
+	}
 
 	/**
 	 * Always returns null since the world has no rotation
