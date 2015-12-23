@@ -26,14 +26,11 @@ import processing.core.PImage;
  * Created by wpgodone on 12/17/2015.
  */
 public class FaceDetector {
-	
+
 	private int						absoluteFaceSize;
+
 	private final VideoCapture		camera;
-	@SuppressWarnings("unused")
-	private double					cvHeight;
-	@SuppressWarnings("unused")
-	private double					cvWidth;
-	private final DetectedFace		detectedFace		= new DetectedFace(null);
+	private final DetectedFace		detectedFace		= new DetectedFace();
 	private final CascadeClassifier	eyesCascade			= new CascadeClassifier();
 
 	private final String			eyesCascadeName		= "CascadeClassifiers\\haarcascade_eye_tree_eyeglasses.xml";
@@ -48,8 +45,7 @@ public class FaceDetector {
 
 	private final String			profileCascadeName	= "CascadeClassifiers\\haarcascade_profileface.xml";
 
-
-	public FaceDetector(PApplet applet)
+	public FaceDetector()
 		{
 			this.camera = new VideoCapture();
 			this.frame = new Mat();
@@ -57,18 +53,16 @@ public class FaceDetector {
 			eyesCascade.load(eyesCascadeName);
 			mouthCascade.load(mouthCascadeName);
 			profileCascade.load(profileCascadeName);
-			
+
 			initialize();
 		}
-		
-		
+
 	public DetectedFace detectFace( )
 		{
 			camera.read(frame);
 			return detectFace(frame, 0);
 		}
-		
-		
+
 	/*
 	 * I follow parts of the tutorial found below to get this face detection
 	 * code. I'm currently trying to get it to work with the eyes.
@@ -78,35 +72,35 @@ public class FaceDetector {
 	private DetectedFace detectFace(Mat frame, float angle)
 		{
 			// Initialize
-			final MatOfRect faces = new MatOfRect();
-			final MatOfRect profiles = new MatOfRect();
+			MatOfRect faces = new MatOfRect();
+			MatOfRect profiles = new MatOfRect();
 			boolean facingRight = true;
-			final Mat grayFrame = new Mat();
-			
+			Mat grayFrame = new Mat();
+
 			// convert the frame in gray scale
 			Imgproc.cvtColor(frame, grayFrame, Imgproc.COLOR_BGR2GRAY);
 			// equalize the frame histogram to improve the result
 			Imgproc.equalizeHist(grayFrame, grayFrame);
-			
-			final Mat profileFrame = new Mat();
+
+			Mat profileFrame = new Mat();
 			grayFrame.copyTo(profileFrame);
-			
+
 			// compute minimum face size (20% of the frame height)
 			if (this.absoluteFaceSize == 0)
 				{
-					final int height = grayFrame.rows();
+					int height = grayFrame.rows();
 					if (Math.round(height * 0.2f) > 0)
 						{
 							this.absoluteFaceSize = Math.round(height * 0.2f);
 						}
 				}
-				
+
 			// detect faces
 			this.faceCascade.detectMultiScale(grayFrame, faces, 1.1, 2, 0 | Objdetect.CASCADE_SCALE_IMAGE,
 			        new Size(this.absoluteFaceSize, this.absoluteFaceSize), new Size());
 			this.profileCascade.detectMultiScale(profileFrame, profiles, 1.1, 2, 0 | Objdetect.CASCADE_SCALE_IMAGE,
 			        new Size(this.absoluteFaceSize, this.absoluteFaceSize), new Size());
-					
+
 			Rect[ ] profileArray = profiles.toArray();
 			if (profileArray.length == 0)
 				{
@@ -116,16 +110,16 @@ public class FaceDetector {
 					        new Size());
 					facingRight = false;
 					profileArray = profiles.toArray();
-					
-					for (final Rect profile : profileArray)
+
+					for (Rect profile : profileArray)
 						{
 							profile.x = grayFrame.width() - profile.x - profile.width;
 						}
 				}
-				
+
 			// each rectangle in faces is a face
-			final Rect[ ] facesArray = faces.toArray();
-			
+			Rect[ ] facesArray = faces.toArray();
+
 			if ((profileArray.length == 0) && (facesArray.length == 1))
 				{
 					processFrontalFaces(grayFrame, frame, facesArray);
@@ -135,39 +129,34 @@ public class FaceDetector {
 					{
 						processProfiles(grayFrame, frame, profileArray, facingRight);
 					}
-					
+
 			return detectedFace;
 		}
-		
-		
+
+
 	public PImage getFrame( )
 		{
 			return new PImage(toBufferedImage(frame));
 		}
-		
-		
+
+
 	private void initialize( )
 		{
 			// Open the first available camera
 			camera.open(0);
-			
-			if (camera.isOpened())
+
+			if (!camera.isOpened())
 				{
-					cvWidth = camera.get(Videoio.CV_CAP_PROP_FRAME_WIDTH);
-					cvHeight = camera.get(Videoio.CV_CAP_PROP_FRAME_HEIGHT);
-				}
-			else
-				{
-					System.err.println("Exiting application: video stream is closed.");
+				    System.err.println("Exiting application: video stream is closed.");
 					System.exit(1);
 				}
 		}
-		
-		
+
+
 	private boolean processFrontalFaces(Mat grayFrame, Mat originalFrame, Rect[ ] faces)
 		{
 			float[ ] leftEye = null, rightEye = null;
-			for (final Rect face : faces)
+			for (Rect face : faces)
 				{
 					int shift = Math.min(30, face.y);
 					shift = Math.min(shift, frame.height() - ((face.y + face.height + shift) - 10));
@@ -179,45 +168,45 @@ public class FaceDetector {
 					 * and br() in the next argument is most likely bottom right
 					 */
 					Imgproc.rectangle(originalFrame, face.tl(), face.br(), new Scalar(0, 255, 0, 255), 1);
-					
+
 					// The face area that was detected in greyscale
-					final Mat greyROI = grayFrame.submat(face);
-					
-					final float[ ][ ] eyeCoordinates = searchForEyes(greyROI, face);
-					
+					Mat greyROI = grayFrame.submat(face);
+
+					float[ ][ ] eyeCoordinates = searchForEyes(greyROI, face);
+
 					if (eyeCoordinates.length == 2)
 						{
-							final float max = Math.max(eyeCoordinates[0][3], eyeCoordinates[1][3]);
-							final float min = Math.min(eyeCoordinates[0][3], eyeCoordinates[1][3]);
+							float max = Math.max(eyeCoordinates[0][3], eyeCoordinates[1][3]);
+							float min = Math.min(eyeCoordinates[0][3], eyeCoordinates[1][3]);
 							if ((max / min) > 1.5)
 								{
 									// If one eye is much bigger than the other,
 									// then the eyes weren't properly detected
 									continue;
 								}
-								
-							final float x1 = eyeCoordinates[0][0], x2 = eyeCoordinates[1][0];
+
+							float x1 = eyeCoordinates[0][0], x2 = eyeCoordinates[1][0];
 							leftEye = x1 < x2 ? eyeCoordinates[0] : eyeCoordinates[1];
 							rightEye = x1 < x2 ? eyeCoordinates[1] : eyeCoordinates[0];
-							
+
 							if ((leftEye[0] + (leftEye[3] / 2)) > (rightEye[0] - rightEye[3]))
 								{
 									// then the eyes overlap, so the eyes
 									// weren't properly detected
 									continue;
 								}
-								
+
 							detectedFace.updateFrontTexture(originalFrame.submat(face), leftEye, rightEye);
 							return true;
 						}
 				}
 			return false;
 		}
-		
-		
+
+
 	private boolean processProfiles(Mat grayFrame, Mat originalFrame, Rect[ ] profiles, boolean facingRight)
 		{
-			for (final Rect profile : profiles)
+			for (Rect profile : profiles)
 				{
 					Imgproc.rectangle(originalFrame, profile.tl(), profile.br(), new Scalar(0, 0, 255, 255), 1);
 					final Mat greyROI = grayFrame.submat(profile);
@@ -228,12 +217,12 @@ public class FaceDetector {
 							        facingRight);
 							return true;
 						}
-						
+
 				}
 			return false;
 		}
-		
-		
+
+
 	public void releaseCamera( )
 		{
 			try
@@ -247,8 +236,8 @@ public class FaceDetector {
 					e.printStackTrace();
 				}
 		}
-		
-		
+
+
 	/**
 	 * The coordinates of the eyes are relative to the detectedFace
 	 *
@@ -261,26 +250,26 @@ public class FaceDetector {
 			final MatOfRect eyes = new MatOfRect();
 			eyesCascade.detectMultiScale(greyFaceSubMat, eyes);
 			final Rect[ ] eyesArray = eyes.toArray();
-			
+
 			final float[ ][ ] eyeCoordinates = new float[eyesArray.length][ ];
-			
+
 			for (int j = 0; j < eyesArray.length; j++)
 				{
 					final Rect e = eyesArray[j];
 					e.x += detectedFace.x;
 					e.y += detectedFace.y;
 					final Size eyeSize = e.size();
-					
+
 					eyeCoordinates[j] = new float[ ] { (float)((e.x - detectedFace.x) + (eyeSize.width / 2)),
 					        (float)((e.y - detectedFace.y) + (eyeSize.height / 2)), (float)eyeSize.width,
 					        (float)eyeSize.height };
-							
+
 					Imgproc.rectangle(frame, e.tl(), e.br(), new Scalar(255, 0, 0, 255), 1);
 				}
 			return eyeCoordinates;
 		}
-		
-		
+
+
 	/*
 	 * Converts the Mat object to an Image object so that it can be encapsulated
 	 * by a PImage to work with processing. Found at:
@@ -289,7 +278,7 @@ public class FaceDetector {
 	 */
 	public Image toBufferedImage(Mat m)
 		{
-			
+
 			int type = BufferedImage.TYPE_BYTE_GRAY;
 			if (m.channels() > 1)
 				{

@@ -45,7 +45,7 @@ public class Main extends PApplet {
 
 	public void setup( )
 		{
-			faceDetector = new FaceDetector(this);
+			faceDetector = new FaceDetector();
 
 			surface.setResizable(false);
 
