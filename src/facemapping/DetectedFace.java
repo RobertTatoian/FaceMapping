@@ -117,7 +117,6 @@ public class DetectedFace {
 				}
 		}
 
-
 	/**
 	 * Returns a PImage of the detected
 	 */
@@ -151,8 +150,6 @@ public class DetectedFace {
 
 			return output;
 		}
-
-
 
 	/**
 	 * Updates the face texture with a newly detected frontal face.
