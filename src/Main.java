@@ -100,16 +100,29 @@ public class Main extends PApplet {
 					image(frame, -worldX, -worldY);
 				}
 				
-			if ((detectedFace != null) && debug)
+			if (detectedFace != null && debug)
 				{
 					final PImage texture = detectedFace.toPImage();
-					
+
+					pushMatrix();
+					translate(0, 0, 1);
 					image(texture, -worldX, -worldY, (200.0f / texture.height) * texture.width, 200);
+					popMatrix();
 				}
 				
 			scene.draw();
 			
 			popMatrix();
+
+
+			if (mouseX > width * 2 / 3)
+			{
+				pushMatrix();
+				fill(0, 0, 0);
+				textAlign(CENTER, BOTTOM);
+				text("Please turn the camera to the left", width / 2, height / 2, 0);
+				popMatrix();
+			}
 		}
 		
 		
@@ -164,6 +177,12 @@ public class Main extends PApplet {
 	@Override
 	public void mouseMoved( )
 		{
+			// Center the camera if the mouse moves out of bounds
+			if (mouseY <= 10 || mouseY + 10 >= height || mouseX <= 10 || mouseX + 30 >= width)
+				{
+					mouseY = height / 2;
+					mouseX = width / 2;
+				}
 			rotation = (((mouseX - width) * 1f) / (width / 2f)) * HALF_PI;
 			elevation = (((mouseY - (height / 2f)) * 0.5f) / height) * HALF_PI;
 			
