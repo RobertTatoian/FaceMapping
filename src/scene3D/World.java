@@ -18,26 +18,26 @@ import sun.reflect.generics.reflectiveObjects.NotImplementedException;
  * @version 1.0
  */
 public class World extends ComplexGraphicObject3D <Cube> {
-	
+
 	/**
 	 * Size of the bounding Cube
 	 */
-	private static final int	BOUNDING_CUBE_SIZE	= 400;
-													
+	private static final int		BOUNDING_CUBE_SIZE	= 400;
+														
 	/**
 	 * The bounding cube
 	 */
-	private final Cube			boundingCube;
-								
+	private final Cube				boundingCube;
+									
 	/**
 	 * The list of all cubes in the world (except the bounding cube).
 	 */
-	private ArrayList <Cube>	cubesInWorld;
-								
-								
+	private final ArrayList <Cube>	cubesInWorld;
+									
+									
 	/**
 	 * Initializes the scene.
-	 * 
+	 *
 	 * @param theApp
 	 *            The applet for the world to be drawn in.
 	 */
@@ -45,43 +45,43 @@ public class World extends ComplexGraphicObject3D <Cube> {
 		{
 			super(new ArrayList <Cube>());
 			cubesInWorld = (ArrayList <Cube>)super.getCollection();
-			
+
 			// Create a cube that will contain all the other cubes in the
 			// application and act as a barrier.
 			// Also remove the fill around the cube so we can see inside it.
 			boundingCube = new Cube(0, 0, 0, BOUNDING_CUBE_SIZE, theApp);
 			boundingCube.setFill(false);
-			
+
 			// Randomly decide the number of cubes we should generate.
-			int numberOfCubesToGenerate = (int)theApp.random(3.0f, 10.0f);
-			
+			final int numberOfCubesToGenerate = (int)theApp.random(3.0f, 10.0f);
+
 			// Generate the cubes and add them to the array list.
 			for (int i = 0; i < numberOfCubesToGenerate; i++)
 				{
-					float size = theApp.random(20.0f, 60.0f);
-					float posLimit = BOUNDING_CUBE_SIZE / 2 - size * .75f;
-					float xPos = theApp.random(-posLimit, posLimit);
-					float yPos = theApp.random(-posLimit, posLimit);
-					float zPos = theApp.random(-posLimit, posLimit);
-					float xRot = theApp.random(2.0f, 10.0f);
-					float yRot = theApp.random(2.0f, 10.0f);
-					float zRot = theApp.random(2.0f, 10.0f);
-					Cube interiorCube = new Cube(xPos, yPos, zPos, size, xRot, yRot, zRot, theApp);
+					final float size = theApp.random(20.0f, 60.0f);
+					final float posLimit = (BOUNDING_CUBE_SIZE / 2) - (size * .75f);
+					final float xPos = theApp.random(-posLimit, posLimit);
+					final float yPos = theApp.random(-posLimit, posLimit);
+					final float zPos = theApp.random(-posLimit, posLimit);
+					final float xRot = theApp.random(2.0f, 10.0f);
+					final float yRot = theApp.random(2.0f, 10.0f);
+					final float zRot = theApp.random(2.0f, 10.0f);
+					final Cube interiorCube = new Cube(xPos, yPos, zPos, size, xRot, yRot, zRot, theApp);
 					cubesInWorld.add(interiorCube);
 				}
 		}
-		
-		
+
+
 	/**
 	 * Makes sure that all cube in the world stay inside the bounding cube.
 	 */
 	private void checkForCollisionsWithBoundingCube( )
 		{
-			BoundingBox3D bounds = boundingCube.getAbsoluteBoundingBox();
-			for (Cube cube : cubesInWorld)
+			final BoundingBox3D bounds = boundingCube.getAbsoluteBoundingBox();
+			for (final Cube cube : cubesInWorld)
 				{
-					BoundingBox3D absolute = cube.getAbsoluteBoundingBox();
-					
+					final BoundingBox3D absolute = cube.getAbsoluteBoundingBox();
+
 					if (absolute.getMinX() < bounds.getMinX())
 						{
 							cube.setTranslationX(
@@ -95,7 +95,7 @@ public class World extends ComplexGraphicObject3D <Cube> {
 								        bounds.getMaxX() - Math.abs(cube.getTranslationX() - absolute.getMaxX()));
 								cube.setXTranslationalVelocity(-cube.getXTranslationalVelocity());
 							}
-							
+
 					if (absolute.getMinY() < bounds.getMinY())
 						{
 							cube.setTranslationY(
@@ -109,7 +109,7 @@ public class World extends ComplexGraphicObject3D <Cube> {
 								        bounds.getMaxY() - Math.abs(cube.getTranslationY() - absolute.getMaxY()));
 								cube.setYTranslationalVelocity(-cube.getYTranslationalVelocity());
 							}
-							
+
 					if (absolute.getMinZ() < bounds.getMinZ())
 						{
 							cube.setTranslationZ(
@@ -124,22 +124,22 @@ public class World extends ComplexGraphicObject3D <Cube> {
 								cube.setZTranslationalVelocity(-cube.getZTranslationalVelocity());
 							}
 				}
-				
+
 		}
-		
-		
+
+
 	/**
 	 * Checks for collisions between cubes in the world and colors an collided
 	 * cubes red.
 	 */
 	private void checkForCubeCollisions( )
 		{
-			int size = cubesInWorld.size();
-			for (Cube c : cubesInWorld)
+			final int size = cubesInWorld.size();
+			for (final Cube c : cubesInWorld)
 				{
 					c.setColor(0xFF00A0A0);
 				}
-				
+
 			for (int i = 0; i < size; i++)
 				{
 					for (int j = i + 1; j < size; j++)
@@ -152,8 +152,8 @@ public class World extends ComplexGraphicObject3D <Cube> {
 						}
 				}
 		}
-		
-		
+
+
 	/**
 	 * Draws the world.
 	 */
@@ -163,20 +163,8 @@ public class World extends ComplexGraphicObject3D <Cube> {
 			super.draw();
 			boundingCube.draw();
 		}
-		
-		
-	/**
-	 * Updates the world.
-	 */
-	@Override
-	public void update( )
-		{
-			checkForCubeCollisions();
-			checkForCollisionsWithBoundingCube();
-			super.update();
-		}
-		
-		
+
+
 	/**
 	 * Always returns null since the world has no rotation
 	 *
@@ -187,8 +175,8 @@ public class World extends ComplexGraphicObject3D <Cube> {
 		{
 			return null;
 		}
-		
-		
+
+
 	/**
 	 * Returns 0 since the World is defined in the world reference frame.
 	 */
@@ -197,8 +185,8 @@ public class World extends ComplexGraphicObject3D <Cube> {
 		{
 			return 0;
 		}
-		
-		
+
+
 	/**
 	 * Returns 0 since the World is defined in the world reference frame.
 	 */
@@ -207,8 +195,8 @@ public class World extends ComplexGraphicObject3D <Cube> {
 		{
 			return 0;
 		}
-		
-		
+
+
 	/**
 	 * Returns 0 since the World is defined in the world reference frame.
 	 */
@@ -217,8 +205,8 @@ public class World extends ComplexGraphicObject3D <Cube> {
 		{
 			return 0;
 		}
-		
-		
+
+
 	/**
 	 * Returns 0 since the World is defined in the world reference frame.
 	 */
@@ -227,8 +215,8 @@ public class World extends ComplexGraphicObject3D <Cube> {
 		{
 			return 0;
 		}
-		
-		
+
+
 	/**
 	 * Returns 0 since the World is defined in the world reference frame.
 	 */
@@ -237,8 +225,8 @@ public class World extends ComplexGraphicObject3D <Cube> {
 		{
 			return 0;
 		}
-		
-		
+
+
 	/**
 	 * Returns 0 since the World is defined in the world reference frame.
 	 */
@@ -247,11 +235,11 @@ public class World extends ComplexGraphicObject3D <Cube> {
 		{
 			return 0;
 		}
-		
-		
+
+
 	/**
 	 * Checks if a point is within the bounds of the scene
-	 * 
+	 *
 	 * @param x
 	 *            The x coordinate of the point (in world coordinates)
 	 * @param y
@@ -265,8 +253,8 @@ public class World extends ComplexGraphicObject3D <Cube> {
 		{
 			return boundingCube.isInside(x, y, z);
 		}
-		
-		
+
+
 	/**
 	 * @throws NotImplementedException
 	 *             This method has not been implemented.
@@ -276,8 +264,8 @@ public class World extends ComplexGraphicObject3D <Cube> {
 		{
 			throw new NotImplementedException();
 		}
-		
-		
+
+
 	/**
 	 * @throws NotImplementedException
 	 *             This method has not been implemented.
@@ -287,8 +275,8 @@ public class World extends ComplexGraphicObject3D <Cube> {
 		{
 			throw new NotImplementedException();
 		}
-		
-		
+
+
 	/**
 	 * @throws NotImplementedException
 	 *             This method has not been implemented.
@@ -298,8 +286,8 @@ public class World extends ComplexGraphicObject3D <Cube> {
 		{
 			throw new NotImplementedException();
 		}
-		
-		
+
+
 	/**
 	 * @throws NotImplementedException
 	 *             This method has not been implemented.
@@ -309,8 +297,8 @@ public class World extends ComplexGraphicObject3D <Cube> {
 		{
 			throw new NotImplementedException();
 		}
-		
-		
+
+
 	/**
 	 * @throws NotImplementedException
 	 *             This method has not been implemented.
@@ -320,8 +308,8 @@ public class World extends ComplexGraphicObject3D <Cube> {
 		{
 			throw new NotImplementedException();
 		}
-		
-		
+
+
 	/**
 	 * @throws NotImplementedException
 	 *             This method has not been implemented.
@@ -330,5 +318,17 @@ public class World extends ComplexGraphicObject3D <Cube> {
 	public void setTranslationZ(float z)
 		{
 			throw new NotImplementedException();
+		}
+
+
+	/**
+	 * Updates the world.
+	 */
+	@Override
+	public void update( )
+		{
+			checkForCubeCollisions();
+			checkForCollisionsWithBoundingCube();
+			super.update();
 		}
 }

@@ -1,9 +1,10 @@
 
 package scene3Dabstract;
 
+
 /**
  * A generic simple graphic object
- * 
+ *
  * @author Robert Tatoian
  * @author Warren Godone-Maresca
  * @version 1.0

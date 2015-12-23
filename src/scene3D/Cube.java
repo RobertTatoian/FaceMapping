@@ -23,7 +23,7 @@ import scene3Dabstract.SimpleGraphicObject3D;
  * @version 1.0
  */
 public class Cube extends SimpleGraphicObject3D {
-	
+
 	/**
 	 * The absolute bounding box for a cube object
 	 */
@@ -32,78 +32,78 @@ public class Cube extends SimpleGraphicObject3D {
 	 * The reference to the main application
 	 */
 	private final PApplet		applet;
-								
+
 	/**
 	 * The default color for each cube in hexadecimal
 	 */
 	private int					color		= 0xFF00A0A0;
-											
+
 	/**
 	 * The image object for each side of the cube
 	 */
 	private PImage				frontTexture, leftTexture, rightTexture;
-								
+
 	/**
 	 * Determines if this cube object is the bounding cube for all the other
 	 * cubes
 	 */
 	private boolean				isBounding	= true;
-											
+
 	/**
 	 * The relative bounding box for each cube
 	 */
 	private final BoundingBox3D	relativeBoundingBox;
-								
+
 	/**
 	 * The rotation of each axis for the cube object
 	 */
 	private float				rotationX, rotationY, rotationZ;
-								
+
 	/**
 	 * The size of the cube
 	 */
 	private final float			size;
-								
+
 	/**
 	 * The translation of each axis for the cube object
 	 */
 	private float				translateX, translateY, translateZ;
-								
+
 	/**
 	 * How fast the cube rotates in the X direction
 	 */
 	private float				xRotationalVelocity;
-								
+
 	/**
 	 * How fast the cube translates in the X direction
 	 */
 	private float				xTranslationalVelocity;
-								
+
 	/**
 	 * How fast the cube rotates in the Y direction
 	 */
 	private float				yRotationalVelocity;
-								
+
 	/**
 	 * How fast the cube translates in the Y direction
 	 */
 	private float				yTranslationalVelocity;
-								
+
 	/**
 	 * How fast the cube rotates in the Z direction
 	 */
 	private float				zRotationalVelocity;
-								
+
 	/**
 	 * How fast the cube translates in the Z direction
 	 */
 	private float				zTranslationalVelocity;
-								
-								
+
+
 	/**
 	 * A more detailed constructor for the cube object, create a cube to the
 	 * specified size and places it at a specific position and rotation.
-	 * 
+	 *
 	 * @param x
 	 *            The X coordinate of the cube
 	 * @param y
@@ -124,35 +124,35 @@ public class Cube extends SimpleGraphicObject3D {
 	public Cube(float x, float y, float z, float size, float rotX, float rotY, float rotZ, PApplet applet)
 		{
 			this.applet = applet;
-			
+
 			translateX = x;
 			translateY = y;
 			translateZ = z;
-			
+
 			rotationX = 0;// rotX;
 			rotationY = 0;// rotY;
 			rotationZ = 0;// rotZ;
-			
+
 			this.size = size;
-			
+
 			relativeBoundingBox = new BoundingBox3D(x, y, z, size, size, size);
 			computeAbsoluteBoundingBox();
-			
+
 			final float translationalLimit = 5f;
 			xTranslationalVelocity = this.applet.random(-translationalLimit, translationalLimit);
 			yTranslationalVelocity = this.applet.random(-translationalLimit, translationalLimit);
 			zTranslationalVelocity = this.applet.random(-translationalLimit, translationalLimit);
-			
+
 			final float rotationalLimit = 0.1f;
 			xRotationalVelocity = this.applet.random(-rotationalLimit, rotationalLimit);
 			yRotationalVelocity = this.applet.random(-rotationalLimit, rotationalLimit);
 			zRotationalVelocity = this.applet.random(-rotationalLimit, rotationalLimit);
 		}
-		
-		
+
+
 	/**
 	 * Creates a cube object at the specified position and of a specified size.
-	 * 
+	 *
 	 * @param x
 	 *            The X coordinate of the cube
 	 * @param y
@@ -168,8 +168,8 @@ public class Cube extends SimpleGraphicObject3D {
 		{
 			this(x, y, z, size, 0, 0, 0, applet);
 		}
-		
-		
+
+
 	/**
 	 * Computes the absolute bounding box of the cube object
 	 */
@@ -178,25 +178,25 @@ public class Cube extends SimpleGraphicObject3D {
 			final List <PVector> corners = getVertices();
 			float xMin = Float.POSITIVE_INFINITY, yMin = Float.POSITIVE_INFINITY, zMin = Float.POSITIVE_INFINITY;
 			float xMax = Float.NEGATIVE_INFINITY, yMax = Float.NEGATIVE_INFINITY, zMax = Float.NEGATIVE_INFINITY;
-			
+
 			for (final PVector corner : corners)
 				{
 					xMax = Math.max(xMax, corner.x);
 					yMax = Math.max(yMax, corner.y);
 					zMax = Math.max(zMax, corner.z);
-					
+
 					xMin = Math.min(xMin, corner.x);
 					yMin = Math.min(yMin, corner.y);
 					zMin = Math.min(zMin, corner.z);
 				}
-				
+
 			absoluteBoundingBox = new BoundingBox3D(xMin, yMin, zMin, xMax - xMin, yMax - yMin, zMax - zMin);
 		}
-		
-		
+
+
 	/**
 	 * Checks to see if two cubes are disjoint along an axis
-	 * 
+	 *
 	 * @param myVertices
 	 *            A list of vertices of this cube object
 	 * @param otherVertices
@@ -208,10 +208,10 @@ public class Cube extends SimpleGraphicObject3D {
 	private boolean disjointAlongAxis(List <PVector> myVertices, List <PVector> otherVertices, PVector axis)
 		{
 			if ((axis.x == 0) && (axis.y == 0) && (axis.z == 0)) { return false; }
-			
+
 			float myMax = Float.NEGATIVE_INFINITY, myMin = Float.POSITIVE_INFINITY;
 			float cubeMax = Float.NEGATIVE_INFINITY, cubeMin = Float.POSITIVE_INFINITY;
-			
+
 			// Find the max and min coordinate of each cube along the axis by
 			// projecting each corner onto the axis
 			for (final PVector corner : myVertices)
@@ -220,20 +220,20 @@ public class Cube extends SimpleGraphicObject3D {
 					myMax = Math.max(myMax, dist);
 					myMin = Math.min(myMin, dist);
 				}
-				
+
 			for (final PVector corner : otherVertices)
 				{
 					final float dist = corner.dot(axis) / axis.mag();
 					cubeMax = Math.max(cubeMax, dist);
 					cubeMin = Math.min(cubeMin, dist);
 				}
-				
+
 			final float totalLength = (myMax - myMin) + (cubeMax - cubeMin);
 			final float totalSpan = Math.max(myMax, cubeMax) - Math.min(myMin, cubeMin);
 			return totalSpan > totalLength;
 		}
-		
-		
+
+
 	/**
 	 * The draw method for the cube
 	 */
@@ -242,15 +242,15 @@ public class Cube extends SimpleGraphicObject3D {
 		{
 			applet.pushMatrix();
 			applet.textureMode(PConstants.NORMAL);
-			
+
 			applet.translate(translateX, translateY, translateZ);
 			applet.rotateX(rotationX);
 			applet.rotateY(rotationY);
 			applet.rotateZ(rotationZ);
-			
+
 			applet.stroke(1, 1, 1);
 			applet.strokeWeight(1f);
-			
+
 			// BEGIN CUBE
 			if (isBounding)
 				{
@@ -260,77 +260,77 @@ public class Cube extends SimpleGraphicObject3D {
 				{
 					applet.noFill();
 				}
-				
+
 			applet.beginShape(PConstants.QUADS);
-			
+
 			if (frontTexture != null)
 				{
 					applet.texture(frontTexture);
 				}
-				
+
 			// Front side
 			applet.vertex(size / 2, size / 2, size / 2, 1, 1);
 			applet.vertex(-size / 2, size / 2, size / 2, 0, 1);
 			applet.vertex(-size / 2, -size / 2, size / 2, 0, 0);
 			applet.vertex(size / 2, -size / 2, size / 2, 1, 0);
-			
+
 			applet.endShape();
 			applet.beginShape(PConstants.QUADS);
-			
+
 			// Top side
 			applet.vertex(size / 2, size / 2, -size / 2);
 			applet.vertex(-size / 2, size / 2, -size / 2);
 			applet.vertex(-size / 2, size / 2, size / 2);
 			applet.vertex(size / 2, size / 2, size / 2);
-			
+
 			// Bottom side
 			applet.vertex(size / 2, -size / 2, size / 2);
 			applet.vertex(-size / 2, -size / 2, size / 2);
 			applet.vertex(-size / 2, -size / 2, -size / 2);
 			applet.vertex(size / 2, -size / 2, -size / 2);
-			
+
 			// Back side
 			applet.vertex(size / 2, -size / 2, -size / 2);
 			applet.vertex(-size / 2, -size / 2, -size / 2);
 			applet.vertex(-size / 2, size / 2, -size / 2);
 			applet.vertex(size / 2, size / 2, -size / 2);
-			
+
 			applet.endShape();
 			applet.beginShape(PConstants.QUADS);
-			
+
 			if (leftTexture != null)
 				{
 					applet.texture(leftTexture);
 				}
-				
+
 			// Left side
 			applet.vertex(-size / 2, size / 2, size / 2, 1, 0);
 			applet.vertex(-size / 2, size / 2, -size / 2, 0, 0);
 			applet.vertex(-size / 2, -size / 2, -size / 2, 0, 1);
 			applet.vertex(-size / 2, -size / 2, size / 2, 1, 1);
-			
+
 			applet.endShape();
 			applet.beginShape(PConstants.QUADS);
-			
+
 			if (rightTexture != null)
 				{
 					applet.texture(rightTexture);
 				}
-				
+
 			// Right side
 			applet.vertex(size / 2, size / 2, -size / 2, 1, 1);
 			applet.vertex(size / 2, size / 2, size / 2, 0, 1);
 			applet.vertex(size / 2, -size / 2, size / 2, 0, 1);
 			applet.vertex(size / 2, -size / 2, -size / 2, 1, 0);
-			
+
 			applet.endShape();
-			
+
 			update();
-			
+
 			applet.popMatrix();
 		}
-		
-		
+
+
 	/**
 	 * Gets the absolute bounding box
 	 *
@@ -340,8 +340,8 @@ public class Cube extends SimpleGraphicObject3D {
 		{
 			return absoluteBoundingBox;
 		}
-		
-		
+
+
 	/**
 	 * Gets the color
 	 *
@@ -351,8 +351,8 @@ public class Cube extends SimpleGraphicObject3D {
 		{
 			return color;
 		}
-		
-		
+
+
 	/**
 	 * Gets the normal vectors of the cube object
 	 *
@@ -361,25 +361,25 @@ public class Cube extends SimpleGraphicObject3D {
 	public List <PVector> getNormalVectors( )
 		{
 			final List <PVector> normals = new LinkedList <PVector>();
-			
+
 			final PMatrix rotMatrix = getRotationMatrix();
-			
+
 			PVector current = new PVector(1, 0, 0);
 			current = rotMatrix.mult(current, null);
 			normals.add(current);
-			
+
 			current = new PVector(0, 1, 0);
 			current = rotMatrix.mult(current, null);
 			normals.add(current);
-			
+
 			current = new PVector(0, 0, 1);
 			current = rotMatrix.mult(current, null);
 			normals.add(current);
-			
+
 			return normals;
 		}
-		
-		
+
+
 	/**
 	 * Gets the parent of the cube object
 	 */
@@ -388,8 +388,8 @@ public class Cube extends SimpleGraphicObject3D {
 		{
 			return null;
 		}
-		
-		
+
+
 	/**
 	 * Gets the relative bounding box of the cube
 	 *
@@ -399,8 +399,8 @@ public class Cube extends SimpleGraphicObject3D {
 		{
 			return relativeBoundingBox;
 		}
-		
-		
+
+
 	/**
 	 * Gets the rotation in the X direction
 	 *
@@ -411,8 +411,8 @@ public class Cube extends SimpleGraphicObject3D {
 		{
 			return rotationX;
 		}
-		
-		
+
+
 	/**
 	 * Gets the rotation in the Y direction
 	 *
@@ -423,8 +423,8 @@ public class Cube extends SimpleGraphicObject3D {
 		{
 			return rotationY;
 		}
-		
-		
+
+
 	/**
 	 * Gets the rotation in the Z direction
 	 *
@@ -435,8 +435,8 @@ public class Cube extends SimpleGraphicObject3D {
 		{
 			return rotationZ;
 		}
-		
-		
+
+
 	/**
 	 * Gets the translation in the X direction
 	 *
@@ -447,8 +447,8 @@ public class Cube extends SimpleGraphicObject3D {
 		{
 			return translateX;
 		}
-		
-		
+
+
 	/**
 	 * Gets the translation in the Y direction
 	 *
@@ -459,8 +459,8 @@ public class Cube extends SimpleGraphicObject3D {
 		{
 			return translateY;
 		}
-		
-		
+
+
 	/**
 	 * Gets the translation in the Z direction
 	 *
@@ -471,8 +471,8 @@ public class Cube extends SimpleGraphicObject3D {
 		{
 			return translateZ;
 		}
-		
-		
+
+
 	/**
 	 * Returns a list of the eight vertices in world coordinates
 	 *
@@ -481,29 +481,29 @@ public class Cube extends SimpleGraphicObject3D {
 	public List <PVector> getVertices( )
 		{
 			final List <PVector> vertices = new ArrayList <PVector>();
-			
+
 			// Front face
 			vertices.add(new PVector(size / 2, size / 2, size / 2));
 			vertices.add(new PVector(-size / 2, size / 2, size / 2));
 			vertices.add(new PVector(-size / 2, -size / 2, size / 2));
 			vertices.add(new PVector(size / 2, -size / 2, size / 2));
-			
+
 			// Back face
 			vertices.add(new PVector(size / 2, size / 2, -size / 2));
 			vertices.add(new PVector(-size / 2, size / 2, -size / 2));
 			vertices.add(new PVector(-size / 2, -size / 2, -size / 2));
 			vertices.add(new PVector(size / 2, -size / 2, -size / 2));
-			
+
 			// Convert each corner to world coordinates
 			for (int i = 0; i < vertices.size(); i++)
 				{
 					vertices.set(i, relativeToParentCoordinates(vertices.get(i)));
 				}
-				
+
 			return vertices;
 		}
-		
-		
+
+
 	/**
 	 * Gets the rotational velocity in the X direction
 	 *
@@ -513,8 +513,8 @@ public class Cube extends SimpleGraphicObject3D {
 		{
 			return xRotationalVelocity;
 		}
-		
-		
+
+
 	/**
 	 * Gets the translation in the X direction
 	 *
@@ -524,8 +524,8 @@ public class Cube extends SimpleGraphicObject3D {
 		{
 			return xTranslationalVelocity;
 		}
-		
-		
+
+
 	/**
 	 * Gets the rotational velocity in the Y direction
 	 *
@@ -535,8 +535,8 @@ public class Cube extends SimpleGraphicObject3D {
 		{
 			return yRotationalVelocity;
 		}
-		
-		
+
+
 	/**
 	 * Gets the translational velocity in the Y direction
 	 *
@@ -546,8 +546,8 @@ public class Cube extends SimpleGraphicObject3D {
 		{
 			return yTranslationalVelocity;
 		}
-		
-		
+
+
 	/**
 	 * Gets the rotational velocity in the Z direction
 	 *
@@ -557,8 +557,8 @@ public class Cube extends SimpleGraphicObject3D {
 		{
 			return zRotationalVelocity;
 		}
-		
-		
+
+
 	/**
 	 * Gets the translational velocity in the Z direction
 	 *
@@ -568,8 +568,8 @@ public class Cube extends SimpleGraphicObject3D {
 		{
 			return zTranslationalVelocity;
 		}
-		
-		
+
+
 	/**
 	 * Detects if a cube intersects another cube
 	 *
@@ -582,19 +582,19 @@ public class Cube extends SimpleGraphicObject3D {
 			final List <PVector> myVertices = getVertices();
 			final List <PVector> cubeVertices = cube.getVertices();
 			final List <PVector> normalVecs = getNormalVectors();
-			
+
 			for (final PVector normal : normalVecs)
 				{
 					if (disjointAlongAxis(myVertices, cubeVertices, normal)) { return false; }
 				}
-				
+
 			final List <PVector> cubeNormals = cube.getNormalVectors();
-			
+
 			for (final PVector normal : cubeNormals)
 				{
 					if (disjointAlongAxis(myVertices, cubeVertices, normal)) { return false; }
 				}
-				
+
 			for (final PVector myNormal : normalVecs)
 				{
 					for (final PVector normal : cubeNormals)
@@ -602,11 +602,11 @@ public class Cube extends SimpleGraphicObject3D {
 							if (disjointAlongAxis(myVertices, cubeVertices, myNormal.cross(normal))) { return false; }
 						}
 				}
-				
+
 			return true;
 		}
-		
-		
+
+
 	@Override
 	public boolean isInside(float x, float y, float z)
 		{
@@ -614,8 +614,8 @@ public class Cube extends SimpleGraphicObject3D {
 			final PVector pos = parentToRelativeCoordinates(x, y, z);
 			return relativeBoundingBox.isInside(pos.x, pos.y, pos.z);
 		}
-		
-		
+
+
 	/**
 	 * Reverses the translational velocity of the cube object
 	 */
@@ -625,8 +625,8 @@ public class Cube extends SimpleGraphicObject3D {
 			yTranslationalVelocity *= -1;
 			zTranslationalVelocity *= -1;
 		}
-		
-		
+
+
 	/**
 	 * Sets the color
 	 *
@@ -637,8 +637,8 @@ public class Cube extends SimpleGraphicObject3D {
 		{
 			this.color = color;
 		}
-		
-		
+
+
 	/**
 	 * Sets the fill
 	 *
@@ -649,8 +649,8 @@ public class Cube extends SimpleGraphicObject3D {
 		{
 			this.isBounding = fill;
 		}
-		
-		
+
+
 	/**
 	 * Sets the front texture
 	 *
@@ -661,8 +661,8 @@ public class Cube extends SimpleGraphicObject3D {
 		{
 			this.frontTexture = frontTexture;
 		}
-		
-		
+
+
 	/**
 	 * Sets the left texture
 	 *
@@ -673,8 +673,8 @@ public class Cube extends SimpleGraphicObject3D {
 		{
 			this.leftTexture = leftTexture;
 		}
-		
-		
+
+
 	/**
 	 * Sets the right texture
 	 *
@@ -685,8 +685,8 @@ public class Cube extends SimpleGraphicObject3D {
 		{
 			this.rightTexture = rightTexture;
 		}
-		
-		
+
+
 	/**
 	 * Sets the rotation on the X axis
 	 *
@@ -698,8 +698,8 @@ public class Cube extends SimpleGraphicObject3D {
 		{
 			this.rotationX = angle;
 		}
-		
-		
+
+
 	/**
 	 * Sets the rotation on the Z axis
 	 *
@@ -711,8 +711,8 @@ public class Cube extends SimpleGraphicObject3D {
 		{
 			this.rotationY = angle;
 		}
-		
-		
+
+
 	/**
 	 * Sets the rotation on the Z axis
 	 *
@@ -724,8 +724,8 @@ public class Cube extends SimpleGraphicObject3D {
 		{
 			this.rotationZ = angle;
 		}
-		
-		
+
+
 	/**
 	 * Set the translation in the X direction
 	 *
@@ -737,8 +737,8 @@ public class Cube extends SimpleGraphicObject3D {
 		{
 			this.translateX = x;
 		}
-		
-		
+
+
 	/**
 	 * Set the translation in the Y direction
 	 *
@@ -750,8 +750,8 @@ public class Cube extends SimpleGraphicObject3D {
 		{
 			this.translateY = y;
 		}
-		
-		
+
+
 	/**
 	 * Set the translation in the Z direction
 	 *
@@ -763,8 +763,8 @@ public class Cube extends SimpleGraphicObject3D {
 		{
 			this.translateZ = z;
 		}
-		
-		
+
+
 	/**
 	 * Sets the rotational velocity in the X direction
 	 *
@@ -775,8 +775,8 @@ public class Cube extends SimpleGraphicObject3D {
 		{
 			this.xRotationalVelocity = velocity;
 		}
-		
-		
+
+
 	/**
 	 * Sets the translational velocity in the X direction
 	 *
@@ -787,11 +787,11 @@ public class Cube extends SimpleGraphicObject3D {
 		{
 			this.xTranslationalVelocity = velocity;
 		}
-		
-		
+
+
 	/**
 	 * Sets the rotational velocity in the Y direction
-	 * 
+	 *
 	 * @param velocity
 	 *            The new velocity to set
 	 */
@@ -799,11 +799,11 @@ public class Cube extends SimpleGraphicObject3D {
 		{
 			this.yRotationalVelocity = velocity;
 		}
-		
-		
+
+
 	/**
 	 * Sets the translational velocity in the X direction
-	 * 
+	 *
 	 * @param velocity
 	 *            The new velocity to set
 	 */
@@ -811,8 +811,8 @@ public class Cube extends SimpleGraphicObject3D {
 		{
 			this.yTranslationalVelocity = velocity;
 		}
-		
-		
+
+
 	/**
 	 * Sets the rotational velocity in the Z direction
 	 *
@@ -823,11 +823,11 @@ public class Cube extends SimpleGraphicObject3D {
 		{
 			this.zRotationalVelocity = velocity;
 		}
-		
-		
+
+
 	/**
 	 * Sets the translational velocity in the X direction
-	 * 
+	 *
 	 * @param velocity
 	 *            The new velocity to set
 	 */
@@ -835,8 +835,8 @@ public class Cube extends SimpleGraphicObject3D {
 		{
 			this.zTranslationalVelocity = velocity;
 		}
-		
-		
+
+
 	/**
 	 * The update function of the cube object
 	 */

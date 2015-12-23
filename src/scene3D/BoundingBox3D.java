@@ -4,24 +4,24 @@ package scene3D;
 
 /**
  * A generic, immutable bounding box in 3d.
- * 
+ *
  * @author Robert Tatoian
  * @author Warren Godone-Maresca
  * @version 1.0
  */
 public class BoundingBox3D {
-
+	
 	/**
 	 * Size of the bounding box
 	 */
 	private final float	width, height, length;
-
+						
 	/**
 	 * Coordinates of the bounding box
 	 */
 	private final float	x, y, z;
-
-
+						
+						
 	/**
 	 * Initializes a bounding box with a given position and size.
 	 *
@@ -47,8 +47,8 @@ public class BoundingBox3D {
 			this.height = height;
 			this.length = length;
 		}
-
-
+		
+		
 	/**
 	 * Accesses the height of the bounding box.
 	 *
@@ -58,8 +58,8 @@ public class BoundingBox3D {
 		{
 			return height;
 		}
-
-
+		
+		
 	/**
 	 * Accesses the length of the bounding box.
 	 *
@@ -69,8 +69,8 @@ public class BoundingBox3D {
 		{
 			return length;
 		}
-
-
+		
+		
 	/**
 	 * Returns the maximum x coordinate of the bounding box.
 	 *
@@ -81,8 +81,8 @@ public class BoundingBox3D {
 		{
 			return Math.max(x, x + width);
 		}
-
-
+		
+		
 	/**
 	 * Returns the maximum y coordinate of the bounding box.
 	 *
@@ -93,8 +93,8 @@ public class BoundingBox3D {
 		{
 			return Math.max(y, y + height);
 		}
-
-
+		
+		
 	/**
 	 * Returns the maximum z coordinate of the bounding box.
 	 *
@@ -105,8 +105,8 @@ public class BoundingBox3D {
 		{
 			return Math.max(z, z + length);
 		}
-
-
+		
+		
 	/**
 	 * Returns the minimum x coordinate of the bounding box.
 	 *
@@ -117,8 +117,8 @@ public class BoundingBox3D {
 		{
 			return Math.min(x, x + width);
 		}
-
-
+		
+		
 	/**
 	 * Returns the minimum y coordinate of the bounding box.
 	 *
@@ -129,8 +129,8 @@ public class BoundingBox3D {
 		{
 			return Math.min(y, y + height);
 		}
-
-
+		
+		
 	/**
 	 * Returns the minimum z coordinate of the bounding box.
 	 *
@@ -141,8 +141,8 @@ public class BoundingBox3D {
 		{
 			return Math.min(z, z + length);
 		}
-
-
+		
+		
 	/**
 	 * Accesses the width of the bounding box.
 	 *
@@ -152,8 +152,8 @@ public class BoundingBox3D {
 		{
 			return width;
 		}
-
-
+		
+		
 	/**
 	 * Checks if a point contained inside the bounding box.
 	 *
