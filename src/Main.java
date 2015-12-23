@@ -187,7 +187,6 @@ public class Main extends PApplet {
 		{
 			rotation =  (mouseX - width) * 1f / (width / 2f) * HALF_PI;
 			elevation = ((mouseY - height / 2f) * 0.5f / height) * HALF_PI;
-			System.out.println(rotation);
 
 			centerX = cos(rotation) * cos(elevation);
 			centerY = sin(rotation) * sin(elevation);

@@ -9,13 +9,18 @@ This project has the following features:
 + The classes are organized into a hierarchy of simple and complex 3d graphic objects
 + Opencv is used for face detection
 + Image processing is used to blend multiple detected faces together
++ 3D camera controls
 
 # Usage
 Run `main.java` to start the program.
 
 + Press the "`" key to enter "debug mode" and see the webcam input.
-+ Press the "a" key to rotate the camera left.
-+ Press the "d" key to rotate the camera right.
++ Press the "w" key to move the camera forward.
++ Press the "s" key to move the camera backward.
++ Press the "a" key to move the camera left.
++ Press the "d" key to move the camera right.
++ Use the mouse to rotate the camera (like in a FPS). You may need to move the a
+  camera around if you aren't facing in the right direction.
 
 The program uses the front and side of your face to build a texture. However,
 to improve results, only certain detected faces are used in the texture. Yet

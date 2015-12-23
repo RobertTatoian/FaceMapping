@@ -1,12 +1,10 @@
 
 package scene3Dabstract;
 
-
 import processing.core.PGraphics;
 import processing.core.PMatrix;
 import processing.core.PVector;
 import processing.opengl.PGraphics3D;
-
 
 /**
  * Specifies the operations of an abstract GraphicObject3D, which: - optionally

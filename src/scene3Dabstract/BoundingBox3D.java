@@ -1,9 +1,8 @@
 
 package scene3Dabstract;
 
-
 /**
- * Created by wpgodone on 12/21/2015.
+ * A generic, immutable bounding box in 3d.
  */
 public class BoundingBox3D {
 	
@@ -16,7 +15,6 @@ public class BoundingBox3D {
 	 * Coordinates of the bounding box
 	 */
 	private final float	x, y, z;
-						
 						
 	/**
 	 * Initializes a bounding box with a given position and size.
@@ -43,61 +41,85 @@ public class BoundingBox3D {
 			this.height = height;
 			this.length = length;
 		}
-		
-		
+
+	/**
+	 * Accesses the width of the bounding box.
+	 *
+	 * @return The size of the bounding box along the x-axis in world units.
+	 */
+	public float getWidth( )
+	{
+		return width;
+	}
+
+	/**
+	 * Accesses the height of the bounding box.
+	 *
+	 * @return The size of the bounding box along the y-axis in world units.
+	 */
 	public float getHeight( )
 		{
 			return height;
 		}
-		
-		
+
+
+	/**
+	 * Accesses the length of the bounding box.
+	 *
+	 * @return The size of the bounding box along the z-axis in world units.
+	 */
 	public float getLength( )
 		{
 			return length;
 		}
-		
-		
+
+	/**
+	 * Returns the maximum x coordinate of the bounding box.
+	 */
 	public float getMaxX( )
 		{
-			return x + width;
+			return Math.max(x, x + width);
 		}
-		
-		
+
+	/**
+	 * Returns the maximum y coordinate of the bounding box.
+	 */
 	public float getMaxY( )
 		{
-			return y + height;
+			return Math.max(y, y + height);
 		}
-		
-		
+
+	/**
+	 * Returns the maximum z coordinate of the bounding box.
+	 */
 	public float getMaxZ( )
 		{
-			return z + length;
+			return Math.max(z, z + length);
 		}
-		
-		
+
+	/**
+	 * Returns the minimum x coordinate of the bounding box.
+	 */
 	public float getMinX( )
 		{
-			return x;
+			return Math.min(x, x + width);
 		}
-		
-		
+
+	/**
+	 * Returns the minimum y coordinate of the bounding box.
+	 */
 	public float getMinY( )
 		{
-			return y;
+			return Math.min(y, y + height);
 		}
-		
-		
+
+	/**
+	 * Returns the minimum z coordinate of the bounding box.
+	 */
 	public float getMinZ( )
 		{
-			return z;
+			return Math.min(z, z + length);
 		}
-		
-		
-	public float getWidth( )
-		{
-			return width;
-		}
-		
 		
 	/**
 	 * Checks if a point contained inside the bounding box.
