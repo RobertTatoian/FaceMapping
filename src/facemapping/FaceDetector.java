@@ -1,6 +1,7 @@
 
 package facemapping;
 
+
 import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
@@ -18,56 +19,56 @@ import org.opencv.videoio.VideoCapture;
 
 import processing.core.PImage;
 
+
 /**
- * 
- * 
  * @author Robert Tatoian
  * @author Warren Godone-Maresca
  * @version 1.0
  */
 public class FaceDetector {
-
+	
 	/**
 	 * The maximum face size to be detected (in pixels).
 	 */
-	private int	absoluteFaceSize;
-
-	/**
-	 * The current frame obtained from the webcam
-	 */
-	private final Mat frame;
-
+	private int						absoluteFaceSize;
+									
 	/**
 	 * Captures input from the webcam
 	 */
-	private final VideoCapture	camera;
-
+	private final VideoCapture		camera;
+									
 	/**
 	 * Maintains a PImage of the overall face that has been detected so far.
 	 */
-	private final DetectedFace	detectedFace = new DetectedFace();
-
+	private final DetectedFace		detectedFace		= new DetectedFace();
+														
+	private final CascadeClassifier	eyesCascade			= new CascadeClassifier();
+														
+	private final String			eyesCascadeName		= "CascadeClassifiers\\haarcascade_eye_tree_eyeglasses.xml";
+	private final CascadeClassifier	faceCascade			= new CascadeClassifier();
+	private final String			faceCascadeName		= "CascadeClassifiers\\haarcascade_frontalface_alt.xml";
+	/**
+	 * The current frame obtained from the webcam
+	 */
+	private final Mat				frame;
+									
 	/**
 	 * Classifiers for each part of the face
 	 */
-	private final CascadeClassifier	mouthCascade	= new CascadeClassifier();
-	private final CascadeClassifier	faceCascade		= new CascadeClassifier();
-	private final CascadeClassifier	profileCascade	= new CascadeClassifier();
-	private final CascadeClassifier	eyesCascade		= new CascadeClassifier();
-
+	private final CascadeClassifier	mouthCascade		= new CascadeClassifier();
 	/**
 	 * Filenames for each of the cascade classifiers
 	 */
-	private final String mouthCascadeName	= "CascadeClassifiers\\haarcascade_smile.xml";
-	private final String profileCascadeName	= "CascadeClassifiers\\haarcascade_profileface.xml";
-	private final String eyesCascadeName	= "CascadeClassifiers\\haarcascade_eye_tree_eyeglasses.xml";
-	private final String faceCascadeName	= "CascadeClassifiers\\haarcascade_frontalface_alt.xml";
-
+	private final String			mouthCascadeName	= "CascadeClassifiers\\haarcascade_smile.xml";
+	private final CascadeClassifier	profileCascade		= new CascadeClassifier();
+	private final String			profileCascadeName	= "CascadeClassifiers\\haarcascade_profileface.xml";
+														
+														
 	/**
-	 * Instantiates the face detector object. It will perform several IO operations
-	 * and get input from your webcam.
+	 * Instantiates the face detector object. It will perform several IO
+	 * operations and get input from your webcam.
 	 */
-	public FaceDetector()
+	public FaceDetector( )
 		{
 			this.camera = new VideoCapture();
 			this.frame = new Mat();
@@ -75,25 +76,11 @@ public class FaceDetector {
 			eyesCascade.load(eyesCascadeName);
 			mouthCascade.load(mouthCascadeName);
 			profileCascade.load(profileCascadeName);
-
+			
 			initialize();
 		}
-
-	/**
-	 * Initializes the camera and other internal variables.
-	 */
-	private void initialize( )
-	{
-		// Open the first available camera
-		camera.open(0);
-
-		if (!camera.isOpened())
-		{
-			System.err.println("Exiting application: video stream is closed.");
-			System.exit(1);
-		}
-	}
-
+		
+		
 	/**
 	 * Detects a face in the current webcam input.
 	 *
@@ -104,45 +91,47 @@ public class FaceDetector {
 			camera.read(frame);
 			return detectFace(frame);
 		}
-
+		
+		
 	/**
 	 * Detects a face in the given frame.
 	 *
-	 * @param frame An OpenCV matrix to be checked.
+	 * @param frame
+	 *            An OpenCV matrix to be checked.
 	 * @return A reference to the internal DetectedFace object.
 	 */
 	private DetectedFace detectFace(Mat frame)
 		{
 			// Initialize
-			MatOfRect faces = new MatOfRect();
-			MatOfRect profiles = new MatOfRect();
+			final MatOfRect faces = new MatOfRect();
+			final MatOfRect profiles = new MatOfRect();
 			boolean facingRight = true;
-			Mat grayFrame = new Mat();
-
+			final Mat grayFrame = new Mat();
+			
 			// convert the frame in gray scale
 			Imgproc.cvtColor(frame, grayFrame, Imgproc.COLOR_BGR2GRAY);
 			// equalize the frame histogram to improve the result
 			Imgproc.equalizeHist(grayFrame, grayFrame);
-
-			Mat profileFrame = new Mat();
+			
+			final Mat profileFrame = new Mat();
 			grayFrame.copyTo(profileFrame);
-
+			
 			// compute minimum face size (20% of the frame height)
 			if (this.absoluteFaceSize == 0)
 				{
-					int height = grayFrame.rows();
+					final int height = grayFrame.rows();
 					if (Math.round(height * 0.2f) > 0)
 						{
 							this.absoluteFaceSize = Math.round(height * 0.2f);
 						}
 				}
-
+				
 			// detect faces
 			this.faceCascade.detectMultiScale(grayFrame, faces, 1.1, 2, 0 | Objdetect.CASCADE_SCALE_IMAGE,
 			        new Size(this.absoluteFaceSize, this.absoluteFaceSize), new Size());
 			this.profileCascade.detectMultiScale(profileFrame, profiles, 1.1, 2, 0 | Objdetect.CASCADE_SCALE_IMAGE,
 			        new Size(this.absoluteFaceSize, this.absoluteFaceSize), new Size());
-
+					
 			Rect[ ] profileArray = profiles.toArray();
 			if (profileArray.length == 0)
 				{
@@ -152,16 +141,16 @@ public class FaceDetector {
 					        new Size());
 					facingRight = false;
 					profileArray = profiles.toArray();
-
-					for (Rect profile : profileArray)
+					
+					for (final Rect profile : profileArray)
 						{
 							profile.x = grayFrame.width() - profile.x - profile.width;
 						}
 				}
-
+				
 			// each rectangle in faces is a face
-			Rect[ ] facesArray = faces.toArray();
-
+			final Rect[ ] facesArray = faces.toArray();
+			
 			if ((profileArray.length == 0) && (facesArray.length == 1))
 				{
 					processFrontalFaces(grayFrame, frame, facesArray);
@@ -171,22 +160,53 @@ public class FaceDetector {
 					{
 						processProfiles(grayFrame, frame, profileArray, facingRight);
 					}
-
+					
 			return detectedFace;
 		}
-
+		
+		
+	/**
+	 * Returns the current camera frame as a PImage
+	 *
+	 * @return A PImage of the current frame
+	 */
+	public PImage getFrame( )
+		{
+			return new PImage(toBufferedImage(frame));
+		}
+		
+		
+	/**
+	 * Initializes the camera and other internal variables.
+	 */
+	private void initialize( )
+		{
+			// Open the first available camera
+			camera.open(0);
+			
+			if (!camera.isOpened())
+				{
+					System.err.println("Exiting application: video stream is closed.");
+					System.exit(1);
+				}
+		}
+		
+		
 	/**
 	 * Updates the DetectedFace's texture with a frontal face if possible.
 	 *
-	 * @param grayFrame		The frame in grayscale
-	 * @param originalFrame	The frame in color
-	 * @param faces 		An array of the bounds of all faces that have been detected
+	 * @param grayFrame
+	 *            The frame in grayscale
+	 * @param originalFrame
+	 *            The frame in color
+	 * @param faces
+	 *            An array of the bounds of all faces that have been detected
 	 * @return True if the texture has been updated, false otherwise.
 	 */
 	private boolean processFrontalFaces(Mat grayFrame, Mat originalFrame, Rect[ ] faces)
 		{
 			float[ ] leftEye = null, rightEye = null;
-			for (Rect face : faces)
+			for (final Rect face : faces)
 				{
 					int shift = Math.min(30, face.y);
 					shift = Math.min(shift, frame.height() - ((face.y + face.height + shift) - 10));
@@ -198,143 +218,159 @@ public class FaceDetector {
 					 * and br() in the next argument is most likely bottom right
 					 */
 					Imgproc.rectangle(originalFrame, face.tl(), face.br(), new Scalar(0, 255, 0, 255), 1);
-
+					
 					// The face area that was detected in greyscale
-					Mat greyROI = grayFrame.submat(face);
-
-					float[ ][ ] eyeCoordinates = searchForEyes(greyROI, face);
-
+					final Mat greyROI = grayFrame.submat(face);
+					
+					final float[ ][ ] eyeCoordinates = searchForEyes(greyROI, face);
+					
 					if (eyeCoordinates.length == 2)
 						{
-							float max = Math.max(eyeCoordinates[0][3], eyeCoordinates[1][3]);
-							float min = Math.min(eyeCoordinates[0][3], eyeCoordinates[1][3]);
+							final float max = Math.max(eyeCoordinates[0][3], eyeCoordinates[1][3]);
+							final float min = Math.min(eyeCoordinates[0][3], eyeCoordinates[1][3]);
 							if ((max / min) > 1.5)
 								{
 									// If one eye is much bigger than the other,
 									// then the eyes weren't properly detected
 									continue;
 								}
-
-							float x1 = eyeCoordinates[0][0], x2 = eyeCoordinates[1][0];
+								
+							final float x1 = eyeCoordinates[0][0], x2 = eyeCoordinates[1][0];
 							leftEye = x1 < x2 ? eyeCoordinates[0] : eyeCoordinates[1];
 							rightEye = x1 < x2 ? eyeCoordinates[1] : eyeCoordinates[0];
-
+							
 							if ((leftEye[0] + (leftEye[3] / 2)) > (rightEye[0] - rightEye[3]))
 								{
 									// then the eyes overlap, so the eyes
 									// weren't properly detected
 									continue;
 								}
-
+								
 							detectedFace.updateFrontTexture(originalFrame.submat(face), leftEye, rightEye);
 							return true;
 						}
 				}
 			return false;
 		}
-
+		
+		
 	/**
 	 * Updates the DetectedFace's texture with side profiles if possible.
 	 *
-	 * @param grayFrame		The frame in grayscale
-	 * @param originalFrame	The frame in color
-	 * @param profiles		An array of the bounds of all profiles that have been detected.
-	 * @param facingRight	True if the profiles are facing right, false otherwise
+	 * @param grayFrame
+	 *            The frame in grayscale
+	 * @param originalFrame
+	 *            The frame in color
+	 * @param profiles
+	 *            An array of the bounds of all profiles that have been
+	 *            detected.
+	 * @param facingRight
+	 *            True if the profiles are facing right, false otherwise
 	 * @return True if the texture has been updated, false otherwise.
 	 */
 	private boolean processProfiles(Mat grayFrame, Mat originalFrame, Rect[ ] profiles, boolean facingRight)
 		{
-			for (Rect profile : profiles)
+			for (final Rect profile : profiles)
 				{
 					Imgproc.rectangle(originalFrame, profile.tl(), profile.br(), new Scalar(0, 0, 255, 255), 1);
-					Mat greyROI = grayFrame.submat(profile);
-					float[ ][ ] eyeCoordinates = searchForEyes(greyROI, profile);
+					final Mat greyROI = grayFrame.submat(profile);
+					final float[ ][ ] eyeCoordinates = searchForEyes(greyROI, profile);
 					if ((eyeCoordinates.length == 1) && (eyeCoordinates[0][0] < (profile.width / 2)))
 						{
 							detectedFace.updateProfileTexture(originalFrame.submat(profile), eyeCoordinates[0],
 							        facingRight);
 							return true;
 						}
-
+						
 				}
 			return false;
 		}
-
-	/**
-	 * Searches for the eyes in a detected face.
-	 *
-	 * @param greyFaceSubMat
-	 * @param detectedFace
-	 * @return An array of the coordinates of all eyes in the detected face
-	 * 		   (relative the the detected face) in the format of {x, y, width, height}
-	 */
-	private float[ ][ ] searchForEyes(Mat greyFaceSubMat, Rect detectedFace)
-		{
-			MatOfRect eyes = new MatOfRect();
-			eyesCascade.detectMultiScale(greyFaceSubMat, eyes);
-			Rect[ ] eyesArray = eyes.toArray();
-
-			float[ ][ ] eyeCoordinates = new float[eyesArray.length][ ];
-
-			for (int j = 0; j < eyesArray.length; j++)
-				{
-					Rect e = eyesArray[j];
-					e.x += detectedFace.x;
-					e.y += detectedFace.y;
-					Size eyeSize = e.size();
-
-					eyeCoordinates[j] = new float[ ] { (float)((e.x - detectedFace.x) + (eyeSize.width / 2)),
-					        (float)((e.y - detectedFace.y) + (eyeSize.height / 2)), (float)eyeSize.width,
-					        (float)eyeSize.height };
-
-					Imgproc.rectangle(frame, e.tl(), e.br(), new Scalar(255, 0, 0, 255), 1);
-				}
-			return eyeCoordinates;
-		}
-
+		
+		
 	/**
 	 * Releases the webcam which was being used to detect faces.
 	 */
 	public void releaseCamera( )
-	{
-		try
 		{
-			camera.release();
+			try
+				{
+					camera.release();
+				}
+			catch (final Exception e)
+				{
+					e.printStackTrace();
+				}
 		}
-		catch (Exception e)
+		
+		
+	/**
+	 * Searches for the eyes in a detected face.
+	 *
+	 * @param greyFaceSubMat
+	 *            The OpenCV matrix containing the grayscale submatrix
+	 * @param detectedFace
+	 *            The OpenCV matrix containing the detected face
+	 * @return An array of the coordinates of all eyes in the detected face
+	 *         (relative the the detected face) in the format of {x, y, width,
+	 *         height}
+	 */
+	private float[ ][ ] searchForEyes(Mat greyFaceSubMat, Rect detectedFace)
 		{
-			e.printStackTrace();
+			final MatOfRect eyes = new MatOfRect();
+			eyesCascade.detectMultiScale(greyFaceSubMat, eyes);
+			final Rect[ ] eyesArray = eyes.toArray();
+			
+			final float[ ][ ] eyeCoordinates = new float[eyesArray.length][ ];
+			
+			for (int j = 0; j < eyesArray.length; j++)
+				{
+					final Rect e = eyesArray[j];
+					e.x += detectedFace.x;
+					e.y += detectedFace.y;
+					final Size eyeSize = e.size();
+					
+					eyeCoordinates[j] = new float[ ] { (float)((e.x - detectedFace.x) + (eyeSize.width / 2)),
+					        (float)((e.y - detectedFace.y) + (eyeSize.height / 2)), (float)eyeSize.width,
+					        (float)eyeSize.height };
+							
+					Imgproc.rectangle(frame, e.tl(), e.br(), new Scalar(255, 0, 0, 255), 1);
+				}
+			return eyeCoordinates;
 		}
-	}
-
+		
+		
 	/**
 	 * Converts the Mat object to an Image object so that it can be encapsulated
 	 * by a PImage to work with processing. Found at:
 	 * http://stackoverflow.com/questions/15670933/opencv-java-load-image-to-gui
 	 * All credit to dannyxyz22 at Stack Overflow.
+	 *
+	 * @param m
+	 *            An OpenCV Matrix object that contains the current frame
+	 * @return An image object containing the OpenCV matrix
 	 */
 	public Image toBufferedImage(Mat m)
 		{
-
+			
 			int type = BufferedImage.TYPE_BYTE_GRAY;
+			
 			if (m.channels() > 1)
 				{
 					type = BufferedImage.TYPE_3BYTE_BGR;
 				}
-			int bufferSize = m.channels() * m.cols() * m.rows();
-			byte[ ] b = new byte[bufferSize];
+				
+			final int bufferSize = m.channels() * m.cols() * m.rows();
+			
+			final byte[ ] b = new byte[bufferSize];
+			
 			m.get(0, 0, b); // get all the pixels
-			BufferedImage image = new BufferedImage(m.cols(), m.rows(), type);
-			byte[ ] targetPixels = ((DataBufferByte)image.getRaster().getDataBuffer()).getData();
+			
+			final BufferedImage image = new BufferedImage(m.cols(), m.rows(), type);
+			
+			final byte[ ] targetPixels = ((DataBufferByte)image.getRaster().getDataBuffer()).getData();
+			
 			System.arraycopy(b, 0, targetPixels, 0, b.length);
+			
 			return image;
 		}
-
-	/**
-	 * Returns the current camera frame as a PImage
-	 */
-	public PImage getFrame( )
-	{
-		return new PImage(toBufferedImage(frame));
-	}
 }
