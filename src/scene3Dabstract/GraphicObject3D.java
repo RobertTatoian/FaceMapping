@@ -20,13 +20,13 @@ import processing.opengl.PGraphics3D;
  * @version 1.0
  */
 public abstract class GraphicObject3D {
-
+	
 	/**
 	 * Draws this object
 	 */
 	public abstract void draw( );
-
-
+	
+	
 	/**
 	 * Returns the current parent. If null is returned, the object's reference
 	 * frame is relative to the world.
@@ -35,8 +35,8 @@ public abstract class GraphicObject3D {
 	 *         otherwise.
 	 */
 	public abstract GraphicObject3D getParent( );
-
-
+	
+	
 	public PMatrix getRotationMatrix( )
 		{
 			// Use PGraphics to get the transformation matrix. Might induce some
@@ -46,11 +46,11 @@ public abstract class GraphicObject3D {
 			g.rotateX(getRotationX());
 			g.rotateY(getRotationY());
 			g.rotateZ(getRotationZ());
-
+			
 			return g.getMatrix();
 		}
-
-
+		
+		
 	/**
 	 * Returns the current rotation about the x-axis (relative to the reference
 	 * frame of the parent).
@@ -58,8 +58,8 @@ public abstract class GraphicObject3D {
 	 * @return The angle of ration in degrees
 	 */
 	public abstract float getRotationX( );
-
-
+	
+	
 	/**
 	 * Returns the current rotation about the y-axis (relative to the reference
 	 * frame of the parent).
@@ -67,8 +67,8 @@ public abstract class GraphicObject3D {
 	 * @return The angle of ration in degrees
 	 */
 	public abstract float getRotationY( );
-
-
+	
+	
 	/**
 	 * Returns the current rotation about the z-axis (relative to the reference
 	 * frame of the parent).
@@ -76,8 +76,8 @@ public abstract class GraphicObject3D {
 	 * @return The angle of ration in degrees
 	 */
 	public abstract float getRotationZ( );
-
-
+	
+	
 	/**
 	 * Returns the transformation matrix from the parent's reference frame to
 	 * this object's reference frame.
@@ -94,11 +94,11 @@ public abstract class GraphicObject3D {
 			g.rotateX(getRotationX());
 			g.rotateY(getRotationY());
 			g.rotateZ(getRotationZ());
-
+			
 			return g.getMatrix();
 		}
-
-
+		
+		
 	/**
 	 * Returns the translation along the x-axis (in world units).
 	 *
@@ -107,8 +107,8 @@ public abstract class GraphicObject3D {
 	 *         otherwise.
 	 */
 	public abstract float getTranslationX( );
-
-
+	
+	
 	/**
 	 * Returns the translation along the y-axis (in world units).
 	 *
@@ -117,8 +117,8 @@ public abstract class GraphicObject3D {
 	 *         otherwise.
 	 */
 	public abstract float getTranslationY( );
-
-
+	
+	
 	/**
 	 * Returns the translation along the z-axis (in world units).
 	 *
@@ -127,8 +127,8 @@ public abstract class GraphicObject3D {
 	 *         otherwise.
 	 */
 	public abstract float getTranslationZ( );
-
-
+	
+	
 	/**
 	 * Determines if the given point (in world-coordinates) is inside this
 	 * object. Note that this method is guaranteed to be fast, but necessarily
@@ -145,8 +145,8 @@ public abstract class GraphicObject3D {
 	 * @return true if this GraphicObject3D contains the point, false otherwise
 	 */
 	public abstract boolean isInside(float x, float y, float z);
-
-
+	
+	
 	/**
 	 * Converts a point in the parent's coordinate system to this object's
 	 * reference frame.
@@ -164,15 +164,15 @@ public abstract class GraphicObject3D {
 		{
 			return parentToRelativeCoordinates(new PVector(x, y, z));
 		}
-
-
+		
+		
 	/**
 	 * Converts a point in the parent's coordinate system to this object's
 	 * reference frame.
 	 *
 	 * @param pos
 	 *            A vector that contains the positon of the object
-	 * @return
+	 * @return The point in the object's reference frame
 	 */
 	public PVector parentToRelativeCoordinates(PVector pos)
 		{
@@ -180,25 +180,37 @@ public abstract class GraphicObject3D {
 				{
 					pos = parentToRelativeCoordinates(pos);
 				}
-
+				
 			final PMatrix transMatrix = getTransformationMatrix();
 			return transMatrix.mult(pos, null);
 		}
-
-
+		
+		
 	/**
 	 * Converts a point in this object's reference frame to the reference frame
 	 * of the parent.
+	 * 
+	 * @param x
+	 *            The X coordinate
+	 * @param y
+	 *            The Y coordinate
+	 * @param z
+	 *            The Z coordinate
+	 * @return The point in the parent's reference frame.
 	 */
 	public PVector relativeToParentCoordinates(float x, float y, float z)
 		{
 			return parentToRelativeCoordinates(new PVector(x, y, z));
 		}
-
-
+		
+		
 	/**
 	 * Converts a point in this object's reference frame to the reference frame
 	 * of the parent.
+	 * 
+	 * @param pos
+	 *            A vector that contains the positon of the object
+	 * @return The point in the parent's reference frame.
 	 */
 	public PVector relativeToParentCoordinates(PVector pos)
 		{
@@ -206,12 +218,12 @@ public abstract class GraphicObject3D {
 				{
 					pos = parentToRelativeCoordinates(pos);
 				}
-
+				
 			final PMatrix transMatrix = getTransformationMatrix();
 			return transMatrix.mult(pos, null);
 		}
-
-
+		
+		
 	/**
 	 * Sets the rotation of the object about the x-axis (relative to the
 	 * parent's reference frame).
@@ -220,8 +232,8 @@ public abstract class GraphicObject3D {
 	 *            The amount of rotation (in world degrees).
 	 */
 	public abstract void setRotationX(float angle);
-
-
+	
+	
 	/**
 	 * Sets the rotation of the object about the y-axis (relative to the
 	 * parent's reference frame).
@@ -230,8 +242,8 @@ public abstract class GraphicObject3D {
 	 *            The amount of rotation (in world degrees).
 	 */
 	public abstract void setRotationY(float angle);
-
-
+	
+	
 	/**
 	 * Sets the rotation of the object about the z-axis (relative to the
 	 * parent's reference frame).
@@ -240,8 +252,8 @@ public abstract class GraphicObject3D {
 	 *            The amount of rotation (in world degrees).
 	 */
 	public abstract void setRotationZ(float angle);
-
-
+	
+	
 	/**
 	 * Set the translation of the object (relative to the parent's refernce
 	 * frame) along the x-axis.
@@ -250,8 +262,8 @@ public abstract class GraphicObject3D {
 	 *            The amount of translation (in world units).
 	 */
 	public abstract void setTranslationX(float x);
-
-
+	
+	
 	/**
 	 * Sets the translation of the object (relative to the parent's reference
 	 * frame) along the y-axis.
@@ -260,8 +272,8 @@ public abstract class GraphicObject3D {
 	 *            The amount of translation (in world units).
 	 */
 	public abstract void setTranslationY(float y);
-
-
+	
+	
 	/**
 	 * Sets the translation of the object (relative to the parent's reference
 	 * frame) along the x-axis.
@@ -270,8 +282,8 @@ public abstract class GraphicObject3D {
 	 *            The amount of translation (in world units).
 	 */
 	public abstract void setTranslationZ(float z);
-
-
+	
+	
 	/**
 	 * Updates the internal state of this object
 	 */

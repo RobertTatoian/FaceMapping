@@ -319,7 +319,7 @@ public class Cube extends SimpleGraphicObject3D {
 	/**
 	 * Returns a list of the eight vertices in world coordinates
 	 *
-	 * @return
+	 * @return A list of vertices of the object
 	 */
 	public List <PVector> getVertices( )
 		{
