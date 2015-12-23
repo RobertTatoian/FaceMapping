@@ -5,7 +5,6 @@ package scene3D;
 import java.util.ArrayList;
 
 import processing.core.PApplet;
-import scene3Dabstract.BoundingBox3D;
 import scene3Dabstract.ComplexGraphicObject3D;
 import scene3Dabstract.GraphicObject3D;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
