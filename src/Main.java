@@ -46,7 +46,6 @@ public class Main extends PApplet {
 		
 	public void setup( )
 		{
-			noCursor();
 
 			faceDetector = new FaceDetector(this);
 
@@ -68,11 +67,14 @@ public class Main extends PApplet {
 			pushMatrix();
 			
 			translate(worldX, worldY);
-			
+
 			// TODO Make the camera rotate around the entire cube.
 			camera(eyeX, 0, eyeZ, eyeX + centerX, centerY, eyeZ + centerZ, 0, 1, 0);
 
 			update();
+			strokeWeight(1f);
+			stroke(255, 0, 0);
+			line(0, 0, 0, 100, 0, 0);
 			
 			PImage frame = faceDetector.getFrame();
 			
@@ -161,19 +163,23 @@ public class Main extends PApplet {
 						break;
 					case 'a':
 						System.out.println("Left");
-						eyeX -= 10;
+						eyeX += 10 * sin(rotation);
+						eyeZ += 10 * cos(rotation);
 						break;
 					case 'd':
 						System.out.println("Right");
-						eyeX += 10;
+						eyeX -= 10 * sin(rotation);
+						eyeZ += 10 * cos(rotation);
 						break;
 					case 'w':
 						System.out.println("Forward");
-						eyeZ -= 10;
+						eyeX += 10 * cos(rotation);
+						eyeZ += 10 * sin(rotation);
 						break;
 					case 's':
 						System.out.println("Backward");
-						eyeZ += 10;
+						eyeX -= 10 * cos(rotation);
+						eyeZ -= 10 * sin(rotation);
 						break;
 					default:
 						System.out.println(key);
@@ -185,8 +191,9 @@ public class Main extends PApplet {
 	@Override
 	public void mouseMoved()
 		{
-			rotation = TWO_PI - (mouseX * 1.f / width) * TWO_PI;
+			rotation =  (mouseX - width) * 1f / (width / 2f) * HALF_PI;
 			elevation = ((mouseY - height / 2f) * 0.5f / height) * HALF_PI;
+			System.out.println(rotation);
 
 			centerX = cos(rotation) * cos(elevation);
 			centerY = sin(rotation) * sin(elevation);
