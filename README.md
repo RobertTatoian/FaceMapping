@@ -13,9 +13,9 @@ This project has the following features:
 # Usage
 Run `main.java` to start the program.
 
-+Press the "`" key to enter "debug mode" and see the webcam input.
-+Press the "a" key to rotate the camera left.
-+Press the "d" key to rotate the camera right.
++ Press the "`" key to enter "debug mode" and see the webcam input.
++ Press the "a" key to rotate the camera left.
++ Press the "d" key to rotate the camera right.
 
 The program uses the front and side of your face to build a texture. However,
 to improve results, only certain detected faces are used in the texture. Yet
